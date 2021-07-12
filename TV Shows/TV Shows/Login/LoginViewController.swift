@@ -19,7 +19,7 @@ final class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setBgColor()
+        setBackgroundColor()
         renderNumberOfTaps()
         initButton()
         initActivityIndicator()
@@ -37,9 +37,9 @@ final class LoginViewController: UIViewController {
         print("Button clicked!")
     }
     
-    private func setBgColor() {
-        let bgColor = UIColor(red: 230.0/255.0, green: 230.0/255.0, blue: 230.0/255.0, alpha: 1.0)
-        view.backgroundColor = bgColor
+    private func setBackgroundColor() {
+        let backgroundColor = UIColor(red: 230.0/255.0, green: 230.0/255.0, blue: 230.0/255.0, alpha: 1.0)
+        view.backgroundColor = backgroundColor
     }
     
     private func initButton() {
