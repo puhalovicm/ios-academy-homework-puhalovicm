@@ -21,8 +21,8 @@ final class LoginViewController: UIViewController {
         
         setBackgroundColor()
         renderNumberOfTaps()
-        initButton()
-        initActivityIndicator()
+        setupButton()
+        setupActivityIndicator()
     }
     
     @IBAction func onButtonClicked(_ sender: Any) {
@@ -42,12 +42,12 @@ final class LoginViewController: UIViewController {
         view.backgroundColor = backgroundColor
     }
     
-    private func initButton() {
+    private func setupButton() {
         button.layer.cornerRadius = 10
         button.setImage(UIImage(named:"add"), for: .normal)
     }
     
-    private func initActivityIndicator() {
+    private func setupActivityIndicator() {
         activityIndicator.color = .systemTeal
         activityIndicator.startAnimating()
         stopAnimatingActivityIndicatorAfterDelay(delay: 3.0)
