@@ -10,11 +10,11 @@ import UIKit
 
 final class LoginViewController: UIViewController {
     
-    @IBOutlet weak var label: UILabel!
-    @IBOutlet weak var button: UIButton!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private weak var label: UILabel!
+    @IBOutlet private weak var button: UIButton!
+    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     
-    var numberOfTaps = 0
+    private var numberOfTaps = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
