@@ -32,38 +32,41 @@ final class LoginViewController: UIViewController {
         printMessage()
         switchActivityIndicatorAnimating()
     }
+}
 
-    private func printMessage() {
+private extension LoginViewController {
+    
+    func printMessage() {
         print("Button clicked!")
     }
     
-    private func setBackgroundColor() {
+    func setBackgroundColor() {
         let backgroundColor = UIColor(red: 230.0/255.0, green: 230.0/255.0, blue: 230.0/255.0, alpha: 1.0)
         view.backgroundColor = backgroundColor
     }
     
-    private func setupButton() {
+    func setupButton() {
         button.layer.cornerRadius = 10
         button.setImage(UIImage(named:"add"), for: .normal)
     }
     
-    private func setupActivityIndicator() {
+    func setupActivityIndicator() {
         activityIndicator.color = .systemTeal
         activityIndicator.startAnimating()
         stopAnimatingActivityIndicatorAfterDelay(delay: 3.0)
     }
     
-    private func stopAnimatingActivityIndicatorAfterDelay(delay: Double) {
+    func stopAnimatingActivityIndicatorAfterDelay(delay: Double) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.activityIndicator.stopAnimating()
         }
     }
     
-    private func renderNumberOfTaps() {
+    func renderNumberOfTaps() {
         label.text = String(numberOfTaps)
     }
     
-    private func switchActivityIndicatorAnimating() {
+    func switchActivityIndicatorAnimating() {
         if (activityIndicator.isAnimating) {
             activityIndicator.stopAnimating()
         } else {
