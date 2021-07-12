@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SVProgressHUD
 
 final class LoginViewController: UIViewController {
     
@@ -19,6 +20,7 @@ final class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupProgressHUD()
         setBackgroundColor()
         renderNumberOfTaps()
         setupButton()
@@ -56,6 +58,13 @@ private extension LoginViewController {
         stopAnimatingActivityIndicatorAfterDelay(delay: 3.0)
     }
     
+    func setupProgressHUD() {
+        SVProgressHUD.show()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            SVProgressHUD.dismiss()
+        }
+    }
+    
     func stopAnimatingActivityIndicatorAfterDelay(delay: Double) {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             self.activityIndicator.stopAnimating()
@@ -74,4 +83,3 @@ private extension LoginViewController {
         }
     }
 }
-

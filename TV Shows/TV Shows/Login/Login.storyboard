@@ -40,9 +40,8 @@
                                     <action selector="onButtonClicked:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="idm-og-UFq"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="VMR-Fs-IGE">
-                                <rect key="frame" x="187" y="428" width="40" height="40"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="VMR-Fs-IGE">
+                                <rect key="frame" x="197" y="438" width="20" height="20"/>
                             </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
@@ -51,9 +50,11 @@
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="b1d-uo-Txh" secondAttribute="trailing" constant="20" id="BXC-VD-TRw"/>
                             <constraint firstItem="b1d-uo-Txh" firstAttribute="top" secondItem="z7n-sL-ONj" secondAttribute="bottom" constant="40" id="GWB-fv-Ek8"/>
                             <constraint firstItem="z7n-sL-ONj" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="100" id="Qgh-C3-wEZ"/>
+                            <constraint firstItem="VMR-Fs-IGE" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="SIe-VZ-mK9"/>
                             <constraint firstItem="b1d-uo-Txh" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="TZj-dN-naw"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="z7n-sL-ONj" secondAttribute="trailing" constant="20" id="Yq3-0m-zgQ"/>
                             <constraint firstItem="z7n-sL-ONj" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="ZqM-mK-SNB"/>
+                            <constraint firstItem="VMR-Fs-IGE" firstAttribute="centerY" secondItem="5EZ-qb-Rvc" secondAttribute="centerY" id="pXQ-Ay-8vR"/>
                         </constraints>
                     </view>
                     <connections>
