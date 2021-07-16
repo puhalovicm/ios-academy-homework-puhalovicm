@@ -187,11 +187,12 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="button" destination="b1d-uo-Txh" id="tI6-Sb-dlF"/>
-                        <outlet property="label" destination="z7n-sL-ONj" id="xRf-dl-g0B"/>
+                        <outlet property="loginButton" destination="b1d-uo-Txh" id="tI6-Sb-dlF"/>
+                        <outlet property="loginLabel" destination="z7n-sL-ONj" id="xRf-dl-g0B"/>
                         <outlet property="passwordTextField" destination="dKw-dv-psp" id="Eq1-sk-kIj"/>
                         <outlet property="registerButton" destination="Iet-LG-yfV" id="qvL-dy-VW6"/>
                         <outlet property="rememberMeButton" destination="1ZN-6T-fQn" id="98e-qk-tYo"/>
+                        <outlet property="scrollView" destination="Pzp-pS-Zkp" id="hkM-IM-WSL"/>
                         <outlet property="usernameTextField" destination="2cr-n5-tdh" id="z5K-UQ-Ern"/>
                     </connections>
                 </viewController>

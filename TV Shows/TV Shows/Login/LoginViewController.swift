@@ -11,12 +11,13 @@ import SVProgressHUD
 
 final class LoginViewController: UIViewController {
     
-    @IBOutlet private weak var label: UILabel!
-    @IBOutlet private weak var button: UIButton!
+    @IBOutlet private weak var loginLabel: UILabel!
+    @IBOutlet private weak var loginButton: UIButton!
     @IBOutlet private weak var registerButton: UIButton!
     @IBOutlet private weak var usernameTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
     @IBOutlet weak var rememberMeButton: UIButton!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     private var username: String = ""
     private var password: String = ""
@@ -32,6 +33,7 @@ final class LoginViewController: UIViewController {
         setupUsernameTextField()
         setupPasswordTextField()
         NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
+        scrollView.bounces = false
     }
 
     deinit {
@@ -130,13 +132,13 @@ private extension LoginViewController {
     }
     
     func setButtonsEnabled(isEnabled: Bool) {
-        button.isEnabled = isEnabled
+        loginButton.isEnabled = isEnabled
         registerButton.isEnabled = isEnabled
         
         if (isEnabled) {
-            button.backgroundColor = UIColor.white
+            loginButton.backgroundColor = UIColor.white
         } else {
-            button.backgroundColor = UIColor.white.withAlphaComponent(0.3)
+            loginButton.backgroundColor = UIColor.white.withAlphaComponent(0.3)
         }
     }
     
@@ -149,10 +151,10 @@ private extension LoginViewController {
     }
     
     func setupButtons() {
-        button.layer.cornerRadius = 25
+        loginButton.layer.cornerRadius = 25
         
-        button.setTitleColor(UIColor.white.withAlphaComponent(0.4), for: .disabled)
-        button.setTitleColor(UIColor(named: "Purple"), for: .normal)
+        loginButton.setTitleColor(UIColor.white.withAlphaComponent(0.4), for: .disabled)
+        loginButton.setTitleColor(UIColor(named: "Purple"), for: .normal)
 
         registerButton.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: .disabled)
         registerButton.setTitleColor(.white, for: .normal)
