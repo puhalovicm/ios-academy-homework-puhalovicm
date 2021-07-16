@@ -13,7 +13,6 @@ final class LoginViewController: UIViewController {
     
     @IBOutlet private weak var label: UILabel!
     @IBOutlet private weak var button: UIButton!
-    @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var registerButton: UIButton!
     @IBOutlet private weak var usernameTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
@@ -30,7 +29,16 @@ final class LoginViewController: UIViewController {
         updateButtons()
         setupProgressHUD()
         setupButtons()
-        setupActivityIndicator()
+        setupUsernameTextField()
+        setupPasswordTextField()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+
+    deinit {
+       NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+
+    @objc func onOrientationChange() {
         setupUsernameTextField()
         setupPasswordTextField()
     }
@@ -48,7 +56,6 @@ final class LoginViewController: UIViewController {
     
     @IBAction func onButtonClicked(_ sender: Any) {
         printMessage()
-        switchActivityIndicatorAnimating()
         print(String(format: "Username: %1$@\nPassword: %2$@\nRememberMe: %3$@", username, password, rememberMeSelected ? "YES" : "NO"))
     }
     
@@ -151,30 +158,10 @@ private extension LoginViewController {
         registerButton.setTitleColor(.white, for: .normal)
     }
     
-    func setupActivityIndicator() {
-        activityIndicator.color = .systemTeal
-        activityIndicator.startAnimating()
-        stopAnimatingActivityIndicatorAfterDelay(delay: 3.0)
-    }
-    
     func setupProgressHUD() {
         SVProgressHUD.show()
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             SVProgressHUD.dismiss()
-        }
-    }
-    
-    func stopAnimatingActivityIndicatorAfterDelay(delay: Double) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            self.activityIndicator.stopAnimating()
-        }
-    }
-    
-    func switchActivityIndicatorAnimating() {
-        if (activityIndicator.isAnimating) {
-            activityIndicator.stopAnimating()
-        } else {
-            activityIndicator.startAnimating()
         }
     }
     
