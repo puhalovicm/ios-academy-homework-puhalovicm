@@ -173,6 +173,8 @@ private extension LoginViewController {
                 SVProgressHUD.showSuccess(withStatus: "Success")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     SVProgressHUD.dismiss()
+                    let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as? HomeViewController
+                    self?.navigationController?.pushViewController(vc!, animated: true)
                 }
             },
             onFailure: { error in
@@ -196,6 +198,8 @@ private extension LoginViewController {
                 SVProgressHUD.showSuccess(withStatus: "Success")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     SVProgressHUD.dismiss()
+                    let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as? HomeViewController
+                    self?.navigationController?.pushViewController(vc!, animated: true)
                 }
             },
             onFailure: { error in
