@@ -64,13 +64,14 @@
                                                         </constraints>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                        <textInputTraits key="textInputTraits"/>
+                                                        <textInputTraits key="textInputTraits" keyboardType="emailAddress" textContentType="email"/>
                                                         <userDefinedRuntimeAttributes>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="placeholderLabel.textColor">
                                                                 <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
+                                                            <action selector="onEmailEnterClicked:" destination="Y6W-OH-hqX" eventType="primaryActionTriggered" id="4f8-lB-x2k"/>
                                                             <action selector="onUsernameChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="6P9-aG-a0Z"/>
                                                         </connections>
                                                     </textField>
@@ -90,6 +91,7 @@
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <action selector="onPasswordChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="eIw-ZX-GJC"/>
+                                                            <action selector="onPasswordEnterClicked:" destination="Y6W-OH-hqX" eventType="primaryActionTriggered" id="ukq-RL-cbd"/>
                                                         </connections>
                                                     </textField>
                                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="MXq-aw-brf">
