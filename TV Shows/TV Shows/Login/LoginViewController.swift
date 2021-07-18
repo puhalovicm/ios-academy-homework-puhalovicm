@@ -14,21 +14,24 @@ final class LoginViewController: UIViewController {
     @IBOutlet private weak var loginLabel: UILabel!
     @IBOutlet private weak var loginButton: UIButton!
     @IBOutlet private weak var registerButton: UIButton!
-    @IBOutlet private weak var usernameTextField: UITextField!
+    @IBOutlet private weak var emailTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
     @IBOutlet weak var rememberMeButton: UIButton!
     @IBOutlet weak var scrollView: UIScrollView!
     
-    private var username: String = ""
+    private var email: String = ""
     private var password: String = ""
     private var rememberMeSelected: Bool = false
     private var showPassword: Bool = false
+    
+    private var loginManager: LoginManager = LoginManager()
 
+    private var user: UserResponse? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         updateButtons()
-        setupProgressHUD()
         setupButtons()
         setupUsernameTextField()
         setupPasswordTextField()
@@ -56,11 +59,50 @@ final class LoginViewController: UIViewController {
         }
     }
     
-    @IBAction func onButtonClicked(_ sender: Any) {
-        printMessage()
-        print(String(format: "Username: %1$@\nPassword: %2$@\nRememberMe: %3$@", username, password, rememberMeSelected ? "YES" : "NO"))
+    @IBAction func onLoginButtonClicked(_ sender: Any) {
+        SVProgressHUD.show()
+        
+        loginManager.login(
+            email: email,
+            password: password,
+            onSuccess: { [weak self] user in
+                self?.user = user
+                SVProgressHUD.showSuccess(withStatus: "Success")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    SVProgressHUD.dismiss()
+                }
+            },
+            onFailure: { error in
+                SVProgressHUD.showError(withStatus: "Failure")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    SVProgressHUD.dismiss()
+                }
+            }
+        )
     }
     
+    @IBAction func onRegisterButtonClicked(_ sender: Any) {
+        SVProgressHUD.show()
+
+        loginManager.register(
+            email: email,
+            password: password,
+            onSuccess: { [weak self] user in
+                self?.user = user
+                
+                SVProgressHUD.showSuccess(withStatus: "Success")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    SVProgressHUD.dismiss()
+                }
+            },
+            onFailure: { error in
+                SVProgressHUD.showError(withStatus: "Failure")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    SVProgressHUD.dismiss()
+                }
+            }
+        )
+    }
     
     @IBAction func onRememberMeSelected(_ sender: Any) {
         rememberMeSelected = !rememberMeSelected
@@ -72,7 +114,7 @@ final class LoginViewController: UIViewController {
     }
     
     @IBAction func onUsernameChanged(_ sender: Any) {
-        username = self.usernameTextField.text ?? ""
+        email = self.emailTextField.text ?? ""
         updateButtons()
     }
     
@@ -93,9 +135,9 @@ private extension LoginViewController {
     }
     
     func setupUsernameTextField() {
-        setBottomLine(textField: self.usernameTextField)
-        setLeftPaddingView(textField: self.usernameTextField)
-        setRightPaddingView(textField: self.usernameTextField)
+        setBottomLine(textField: self.emailTextField)
+        setLeftPaddingView(textField: self.emailTextField)
+        setRightPaddingView(textField: self.emailTextField)
     }
     
     func setBottomLine(textField: UITextField, height: CGFloat = 1.0) {
@@ -143,11 +185,7 @@ private extension LoginViewController {
     }
     
     func checkLoginParams() -> Bool {
-        return !username.isEmpty && !password.isEmpty
-    }
-    
-    func printMessage() {
-        print("Button clicked!")
+        return !email.isEmpty && !password.isEmpty
     }
     
     func setupButtons() {
@@ -158,13 +196,6 @@ private extension LoginViewController {
 
         registerButton.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: .disabled)
         registerButton.setTitleColor(.white, for: .normal)
-    }
-    
-    func setupProgressHUD() {
-        SVProgressHUD.show()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            SVProgressHUD.dismiss()
-        }
     }
     
     func setShowPasswordButtonImage(showPasswordButton: UIButton) {
