@@ -71,8 +71,8 @@
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
+                                                            <action selector="onEmailChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="hhm-cB-H3N"/>
                                                             <action selector="onEmailEnterClicked:" destination="Y6W-OH-hqX" eventType="primaryActionTriggered" id="4f8-lB-x2k"/>
-                                                            <action selector="onUsernameChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="6P9-aG-a0Z"/>
                                                         </connections>
                                                     </textField>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dKw-dv-psp">

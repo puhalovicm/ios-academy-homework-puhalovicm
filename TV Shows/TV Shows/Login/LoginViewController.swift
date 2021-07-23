@@ -10,15 +10,15 @@ import UIKit
 import SVProgressHUD
 
 final class LoginViewController: UIViewController {
-    
+
     @IBOutlet private weak var loginLabel: UILabel!
     @IBOutlet private weak var loginButton: UIButton!
     @IBOutlet private weak var registerButton: UIButton!
     @IBOutlet private weak var emailTextField: UITextField!
     @IBOutlet private weak var passwordTextField: UITextField!
-    @IBOutlet weak var rememberMeButton: UIButton!
-    @IBOutlet weak var scrollView: UIScrollView!
-    
+    @IBOutlet private weak var rememberMeButton: UIButton!
+    @IBOutlet private weak var scrollView: UIScrollView!
+
     private var email: String = ""
     private var password: String = ""
     private var rememberMeSelected: Bool = false
@@ -30,16 +30,16 @@ final class LoginViewController: UIViewController {
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        updateButtons()
+
         setupButtons()
-        setupUsernameTextField()
+        setButtonsEnabled(isEnabled: isInputValid)
+        setupProgressHUD()
+        setupEmailTextField()
         setupPasswordTextField()
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
-        scrollView.bounces = false
+
         hideKeyboardWhenTappedAround()
     }
     
@@ -48,9 +48,12 @@ final class LoginViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
-    
+}
+
+private extension LoginViewController {
+
     @objc func onOrientationChange() {
-        setupUsernameTextField()
+        setupEmailTextField()
         setupPasswordTextField()
     }
     
@@ -116,16 +119,11 @@ final class LoginViewController: UIViewController {
         }
         view.endEditing(true)
     }
-    
+
     @IBAction func onShowPasswordClicked(_ showPasswordButton: UIButton!) {
         showPassword = !showPassword
-        if showPassword {
-            self.passwordTextField.isSecureTextEntry = false
-            setShowPasswordButtonImage(showPasswordButton: showPasswordButton)
-        } else {
-            self.passwordTextField.isSecureTextEntry = true
-            setDoNotShowPasswordButtonImage(showPasswordButton: showPasswordButton)
-        }
+        passwordTextField.isSecureTextEntry = !showPassword
+        setShowPassword(showPasswordButton: showPasswordButton, shouldShow: showPassword)
     }
     
     @IBAction func onLoginButtonClicked(_ sender: Any) {
@@ -139,28 +137,21 @@ final class LoginViewController: UIViewController {
             attemptRegister()
         }
     }
-    
+
     @IBAction func onRememberMeSelected(_ sender: Any) {
         rememberMeSelected = !rememberMeSelected
-        if rememberMeSelected {
-            setRememberMeSelectedImage()
-        } else {
-            setRememberMeUnselectedImage()
-        }
+        setRememberMe(isSelected: rememberMeSelected)
     }
-    
-    @IBAction func onUsernameChanged(_ sender: Any) {
-        email = self.emailTextField.text ?? ""
-        updateButtons()
-    }
-    
-    @IBAction func onPasswordChanged(_ sender: Any) {
-        password = self.passwordTextField.text ?? ""
-        updateButtons()
-    }
-}
 
-private extension LoginViewController {
+    @IBAction func onEmailChanged(_ sender: Any) {
+        email = emailTextField.text ?? ""
+        setButtonsEnabled(isEnabled: isInputValid)
+    }
+
+    @IBAction func onPasswordChanged(_ sender: Any) {
+        password = passwordTextField.text ?? ""
+        setButtonsEnabled(isEnabled: isInputValid)
+    }
     
     func attemptLogin() {
         SVProgressHUD.show()
@@ -212,26 +203,25 @@ private extension LoginViewController {
     }
     
     func setupPasswordTextField() {
-        setBottomLine(textField: self.passwordTextField)
-        setLeftPaddingView(textField: self.passwordTextField)
-        self.passwordTextField.rightView = createShowPasswordButton()
-        self.passwordTextField.rightViewMode = .always
-        
+        setBottomLine(textField: passwordTextField)
+        setLeftPaddingView(textField: passwordTextField)
+        passwordTextField.rightView = createShowPasswordButton()
+        passwordTextField.rightViewMode = .always
     }
     
-    func setupUsernameTextField() {
-        setBottomLine(textField: self.emailTextField)
-        setLeftPaddingView(textField: self.emailTextField)
-        setRightPaddingView(textField: self.emailTextField)
+    func setupEmailTextField() {
+        setBottomLine(textField: emailTextField)
+        setLeftPaddingView(textField: emailTextField)
+        setRightPaddingView(textField: emailTextField)
     }
     
     func setBottomLine(textField: UITextField, height: CGFloat = 1.0) {
         textField.layer.masksToBounds = true
-        let usernameBottomLine = CALayer()
-        usernameBottomLine.frame = CGRect(x: 0.0, y: textField.frame.height - height, width: textField.frame.width, height: height)
-        usernameBottomLine.backgroundColor = UIColor.white.cgColor
-        textField.borderStyle = UITextField.BorderStyle.none
-        textField.layer.addSublayer(usernameBottomLine)
+        let bottomLine = CALayer()
+        bottomLine.frame = CGRect(x: 0.0, y: textField.frame.height - height, width: view.frame.width - 40, height: height)
+        bottomLine.backgroundColor = UIColor.white.cgColor
+        textField.borderStyle = .none
+        textField.layer.addSublayer(bottomLine)
     }
     
     func setLeftPaddingView(textField: UITextField, padding: CGFloat = 10) {
@@ -250,27 +240,27 @@ private extension LoginViewController {
         let showPasswordButton = UIButton(type: .custom)
         showPasswordButton.setImage(UIImage(named: "ic-invisible"), for: .normal)
         showPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-        showPasswordButton.addTarget(self, action: #selector(self.onShowPasswordClicked), for: .touchUpInside)
+        showPasswordButton.addTarget(self, action: #selector(onShowPasswordClicked), for: .touchUpInside)
         return showPasswordButton
-    }
-    
-    func updateButtons() {
-        setButtonsEnabled(isEnabled: checkLoginParams())
     }
     
     func setButtonsEnabled(isEnabled: Bool) {
         loginButton.isEnabled = isEnabled
         registerButton.isEnabled = isEnabled
         
-        if (isEnabled) {
-            loginButton.backgroundColor = UIColor.white
+        if isEnabled {
+            loginButton.backgroundColor = .white
         } else {
-            loginButton.backgroundColor = UIColor.white.withAlphaComponent(0.3)
+            loginButton.backgroundColor = .white.withAlphaComponent(0.3)
         }
     }
+
+    var isInputValid: Bool {
+        !email.isEmpty && !password.isEmpty
+    }
     
-    func checkLoginParams() -> Bool {
-        return !email.isEmpty && !password.isEmpty
+    func printMessage() {
+        print("Button clicked!")
     }
     
     func setupButtons() {
@@ -282,28 +272,23 @@ private extension LoginViewController {
         registerButton.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: .disabled)
         registerButton.setTitleColor(.white, for: .normal)
     }
-    
-    func setShowPasswordButtonImage(showPasswordButton: UIButton) {
-        if let image = UIImage(named: "ic-visible") {
-            showPasswordButton.setImage(image, for: .normal)
+
+    func setupProgressHUD() {
+        SVProgressHUD.show()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            SVProgressHUD.dismiss()
         }
     }
-    
-    func setDoNotShowPasswordButtonImage(showPasswordButton: UIButton) {
-        if let image = UIImage(named: "ic-invisible") {
-            showPasswordButton.setImage(image, for: .normal)
-        }
+
+    func setShowPassword(showPasswordButton: UIButton, shouldShow: Bool) {
+        let imageName = shouldShow ? "ic-visible" : "ic-invisible"
+        guard let image = UIImage(named: imageName) else { return }
+        showPasswordButton.setImage(image, for: .normal)
     }
-    
-    func setRememberMeSelectedImage() {
-        if let image = UIImage(named: "ic-checkbox-selected") {
-            self.rememberMeButton.setImage(image, for: .normal)
-        }
-    }
-    
-    func setRememberMeUnselectedImage() {
-        if let image = UIImage(named: "ic-checkbox-unselected") {
-            self.rememberMeButton.setImage(image, for: .normal)
-        }
+
+    func setRememberMe(isSelected: Bool) {
+        let imageName = isSelected ? "ic-checkbox-selected" : "ic-checkbox-unselected"
+        guard let image = UIImage(named: imageName) else { return }
+        rememberMeButton.setImage(image, for: .normal)
     }
 }
