@@ -8,14 +8,14 @@
 import Foundation
 
 struct User: Codable {
-   let email: Optional<String>
-   let imageUrl: Optional<String>
-   let id: Optional<String>
+   let email: String
+   let imageUrl: String?
+   let id: String
    
     enum CodingKeys: String, CodingKey {
         case email
         case imageUrl = "image_url"
-        case id = "_id"
+        case id
    }
 }
 

@@ -11,6 +11,8 @@ import SVProgressHUD
 
 final class LoginViewController: UIViewController {
 
+    static let defaultMessageDuration: Double = 0.5
+
     @IBOutlet private weak var loginLabel: UILabel!
     @IBOutlet private weak var loginButton: UIButton!
     @IBOutlet private weak var registerButton: UIButton!
@@ -27,18 +29,21 @@ final class LoginViewController: UIViewController {
     private var loginManager: LoginManager = LoginManager()
     
     private var user: UserResponse? = nil
-        
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupButtons()
         setButtonsEnabled(isEnabled: isInputValid)
-        setupProgressHUD()
         setupEmailTextField()
         setupPasswordTextField()
         NotificationCenter.default.addObserver(self, selector: #selector(onOrientationChange), name: UIDevice.orientationDidChangeNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         hideKeyboardWhenTappedAround()
     }
@@ -51,6 +56,12 @@ final class LoginViewController: UIViewController {
 }
 
 private extension LoginViewController {
+
+    func delayedAction(duration: Double = defaultMessageDuration, action: @escaping () -> ()) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+            action()
+        }
+    }
 
     @objc func onOrientationChange() {
         setupEmailTextField()
@@ -70,10 +81,10 @@ private extension LoginViewController {
         
         let firstResponder: UITextField
         
-        if self.emailTextField.isFirstResponder {
-            firstResponder = self.emailTextField
+        if emailTextField.isFirstResponder {
+            firstResponder = emailTextField
         } else {
-            firstResponder = self.passwordTextField
+            firstResponder = passwordTextField
         }
         
         if let frame = firstResponder.superview?.convert(firstResponder.frame, to: nil) {
@@ -110,13 +121,21 @@ private extension LoginViewController {
     }
     
     @IBAction func onEmailEnterClicked(_ sender: Any) {
-        self.passwordTextField.becomeFirstResponder()
+        passwordTextField.becomeFirstResponder()
     }
     
     @IBAction func onPasswordEnterClicked(_ sender: Any) {
-        if (!(passwordTextField.text?.isEmpty ?? true) && !(emailTextField.text?.isEmpty ?? true)) {
-            attemptLogin()
+        guard
+            let email = emailTextField.text,
+            let password = passwordTextField.text,
+            !email.isEmpty,
+            !password.isEmpty
+        else {
+            showInputErrorMessage()
+            return
         }
+
+        attemptLogin()
         view.endEditing(true)
     }
 
@@ -127,15 +146,33 @@ private extension LoginViewController {
     }
     
     @IBAction func onLoginButtonClicked(_ sender: Any) {
-        if (!(passwordTextField.text?.isEmpty ?? true) && !(emailTextField.text?.isEmpty ?? true)) {
-            attemptLogin()
+        guard
+            let email = emailTextField.text,
+            let password = passwordTextField.text,
+            !email.isEmpty,
+            !password.isEmpty
+        else {
+            showInputErrorMessage()
+            return
         }
+
+        attemptLogin()
+        view.endEditing(true)
     }
     
     @IBAction func onRegisterButtonClicked(_ sender: Any) {
-        if (!(passwordTextField.text?.isEmpty ?? true) && !(emailTextField.text?.isEmpty ?? true)) {
-            attemptRegister()
+        guard
+            let email = emailTextField.text,
+            let password = passwordTextField.text,
+            !email.isEmpty,
+            !password.isEmpty
+        else {
+            showInputErrorMessage()
+            return
         }
+
+        attemptRegister()
+        view.endEditing(true)
     }
 
     @IBAction func onRememberMeSelected(_ sender: Any) {
@@ -158,23 +195,17 @@ private extension LoginViewController {
         
         loginManager.login(
             email: email,
-            password: password,
-            onSuccess: { [weak self] user in
+            password: password
+        ) { [weak self] result in
+            switch result{
+            case .success (let user):
                 self?.user = user
-                SVProgressHUD.showSuccess(withStatus: "Success")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    SVProgressHUD.dismiss()
-                    let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as? HomeViewController
-                    self?.navigationController?.pushViewController(vc!, animated: true)
-                }
-            },
-            onFailure: { error in
-                SVProgressHUD.showError(withStatus: "Failure")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    SVProgressHUD.dismiss()
-                }
+                self?.showSuccessMessage()
+                self?.showHomeViewController()
+            case .failure:
+                self?.showNetworkErrorMessage()
             }
-        )
+        }
     }
     
     func attemptRegister() {
@@ -182,39 +213,58 @@ private extension LoginViewController {
         
         loginManager.register(
             email: email,
-            password: password,
-            onSuccess: { [weak self] user in
+            password: password
+        ) { [weak self] result in
+            switch result {
+            case .success(let user):
                 self?.user = user
-                
-                SVProgressHUD.showSuccess(withStatus: "Success")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    SVProgressHUD.dismiss()
-                    let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as? HomeViewController
-                    self?.navigationController?.pushViewController(vc!, animated: true)
-                }
-            },
-            onFailure: { error in
-                SVProgressHUD.showError(withStatus: "Failure")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    SVProgressHUD.dismiss()
-                }
+                self?.showSuccessMessage()
+                self?.showHomeViewController()
+            case .failure:
+                self?.showNetworkErrorMessage()
             }
-        )
+        }
     }
-    
+
+    func showInputErrorMessage() {
+        SVProgressHUD.showError(withStatus: "Please enter username and password")
+        delayedAction {
+            SVProgressHUD.dismiss()
+        }
+    }
+
+    func showNetworkErrorMessage() {
+        SVProgressHUD.showError(withStatus: "Failure")
+        delayedAction {
+            SVProgressHUD.dismiss()
+        }
+    }
+
+    func showSuccessMessage() {
+        SVProgressHUD.showSuccess(withStatus: "Success")
+        delayedAction {
+            SVProgressHUD.dismiss()
+        }
+    }
+
+    func showHomeViewController() {
+        let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
     func setupPasswordTextField() {
         setBottomLine(textField: passwordTextField)
         setLeftPaddingView(textField: passwordTextField)
         passwordTextField.rightView = createShowPasswordButton()
         passwordTextField.rightViewMode = .always
     }
-    
+
     func setupEmailTextField() {
         setBottomLine(textField: emailTextField)
         setLeftPaddingView(textField: emailTextField)
         setRightPaddingView(textField: emailTextField)
     }
-    
+
     func setBottomLine(textField: UITextField, height: CGFloat = 1.0) {
         textField.layer.masksToBounds = true
         let bottomLine = CALayer()
@@ -223,19 +273,19 @@ private extension LoginViewController {
         textField.borderStyle = .none
         textField.layer.addSublayer(bottomLine)
     }
-    
+
     func setLeftPaddingView(textField: UITextField, padding: CGFloat = 10) {
         let leftPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: padding, height: textField.frame.height))
         textField.leftView = leftPaddingView
         textField.leftViewMode = .always
     }
-    
+
     func setRightPaddingView(textField: UITextField, padding: CGFloat = 10) {
         let rightPaddingView = UIView(frame: CGRect(x: 0, y: 0, width: padding, height: textField.frame.height))
         textField.rightView = rightPaddingView
         textField.rightViewMode = .always
     }
-    
+
     func createShowPasswordButton() -> UIButton {
         let showPasswordButton = UIButton(type: .custom)
         showPasswordButton.setImage(UIImage(named: "ic-invisible"), for: .normal)
@@ -243,11 +293,11 @@ private extension LoginViewController {
         showPasswordButton.addTarget(self, action: #selector(onShowPasswordClicked), for: .touchUpInside)
         return showPasswordButton
     }
-    
+
     func setButtonsEnabled(isEnabled: Bool) {
         loginButton.isEnabled = isEnabled
         registerButton.isEnabled = isEnabled
-        
+
         if isEnabled {
             loginButton.backgroundColor = .white
         } else {
@@ -258,26 +308,19 @@ private extension LoginViewController {
     var isInputValid: Bool {
         !email.isEmpty && !password.isEmpty
     }
-    
+
     func printMessage() {
         print("Button clicked!")
     }
-    
+
     func setupButtons() {
         loginButton.layer.cornerRadius = 25
-        
+
         loginButton.setTitleColor(UIColor.white.withAlphaComponent(0.4), for: .disabled)
         loginButton.setTitleColor(UIColor(named: "Purple"), for: .normal)
-        
+
         registerButton.setTitleColor(UIColor.white.withAlphaComponent(0.5), for: .disabled)
         registerButton.setTitleColor(.white, for: .normal)
-    }
-
-    func setupProgressHUD() {
-        SVProgressHUD.show()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            SVProgressHUD.dismiss()
-        }
     }
 
     func setShowPassword(showPasswordButton: UIButton, shouldShow: Bool) {

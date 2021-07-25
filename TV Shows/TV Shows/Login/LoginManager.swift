@@ -10,40 +10,58 @@ import Alamofire
 
 class LoginManager {
     
-    let networkManager = NetworkManager()
+    let networkManager = NetworkManager.sharedInstance
     
-    func login(email: String, password: String, onSuccess: @escaping (UserResponse) -> Void, onFailure: @escaping (Error) -> Void) {
-        let parameters: [String: String] = [
-            "email": email,
-            "password": password
-        ]
+    func login(email: String, password: String, onResult: @escaping (Result<UserResponse, Error>) -> Void) {
+        let type = LoginEndPointType(email: email, password: password)
         
-        let type = LoginEndPointType()
-        
-        networkManager.call(type: type, params: parameters, onSuccess: onSuccess, onFailure: onFailure)
+        networkManager.call(type: type, onResult: onResult)
     }
     
-    func register(email: String, password: String, onSuccess: @escaping (UserResponse) -> Void, onFailure: @escaping (Error) -> Void) {
-        let parameters: [String: String] = [
-            "email": email,
-            "password": password,
-            "password_confirmation": password
-        ]
+    func register(email: String, password: String, onResult: @escaping (Result<UserResponse, Error>) -> Void) {
+        let type = RegisterEndPointType(email: email, password: password)
         
-        let type = RegisterEndPointType()
-        
-        networkManager.call(type: type, params: parameters, onSuccess: onSuccess, onFailure: onFailure)
+        networkManager.call(type: type, onResult: onResult)
     }
 }
 
 class LoginEndPointType : EndPointType {
-    var baseURL = "https://tv-shows.infinum.academy"
+
+    let email: String
+    let password: String
+    var params: [String: String]
+
+    init(email: String, password: String) {
+        self.email = email
+        self.password = password
+        self.params = [
+            "email": email,
+            "password": password
+        ]
+    }
+
+    var baseURL = Constants.baseUrl
     var path = "/users/sign_in"
     var httpMethod = HTTPMethod.post
 }
 
 class RegisterEndPointType : EndPointType {
-    var baseURL = "https://tv-shows.infinum.academy"
+
+    let email: String
+    let password: String
+    var params: [String: String]
+
+    init(email: String, password: String) {
+        self.email = email
+        self.password = password
+        self.params = [
+            "email": email,
+            "password": password,
+            "password_confirmation": password
+        ]
+    }
+
+    var baseURL = Constants.baseUrl
     var path = "/users"
     var httpMethod = HTTPMethod.post
 }
