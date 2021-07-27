@@ -27,8 +27,9 @@ final class LoginViewController: UIViewController {
     private var showPassword: Bool = false
     
     private var loginManager: LoginManager = LoginManager()
-    
+
     private var user: UserResponse? = nil
+    private var authInfo: AuthInfo? = nil
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -46,6 +47,13 @@ final class LoginViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         hideKeyboardWhenTappedAround()
+
+        #if DEBUG
+        loginButton.isEnabled = true
+        registerButton.isEnabled = true
+        email = "mateo.puhalovic@test.com"
+        password = "password1"
+        #endif
     }
     
     deinit {
@@ -197,9 +205,14 @@ private extension LoginViewController {
             email: email,
             password: password
         ) { [weak self] result in
-            switch result{
+            switch result {
             case .success (let user):
-                self?.user = user
+                self?.user = user.0
+
+                if let headers = user.1 {
+                    self?.authInfo = AuthInfo(headers: headers)
+                }
+                
                 self?.showSuccessMessage()
                 self?.showHomeViewController()
             case .failure:
@@ -217,27 +230,28 @@ private extension LoginViewController {
         ) { [weak self] result in
             switch result {
             case .success(let user):
-                self?.user = user
+                self?.user = user.0
+
+                if let headers = user.1 {
+                    self?.authInfo = AuthInfo(headers: headers)
+                }
+
                 self?.showSuccessMessage()
                 self?.showHomeViewController()
             case .failure:
-                self?.showNetworkErrorMessage()
+                self?.showErrorAlert()
             }
         }
     }
 
     func showInputErrorMessage() {
-        SVProgressHUD.showError(withStatus: "Please enter username and password")
-        delayedAction {
-            SVProgressHUD.dismiss()
-        }
+        SVProgressHUD.dismiss()
+        showErrorAlert(message: "Please enter username and password.")
     }
 
     func showNetworkErrorMessage() {
-        SVProgressHUD.showError(withStatus: "Failure")
-        delayedAction {
-            SVProgressHUD.dismiss()
-        }
+        SVProgressHUD.dismiss()
+        showErrorAlert(message: "Please check whether you entered correct username and password.")
     }
 
     func showSuccessMessage() {
@@ -249,7 +263,38 @@ private extension LoginViewController {
 
     func showHomeViewController() {
         let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+
+        guard let authInfo = authInfo else {
+            return
+        }
+
+        vc.authInfo = authInfo
+        vc.userResponse = user
+
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func showErrorAlert(
+        title: String = "Error occurred",
+        message: String = "Error occurred! Please try again later."
+    ) {
+        let alert = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+
+        alert.addAction(
+            UIAlertAction(
+                title: "Ok",
+                style: .default,
+                handler: { _ in
+                    // NO - OP
+                }
+            )
+        )
+
+        self.present(alert, animated: true, completion: nil)
     }
 
     func setupPasswordTextField() {
@@ -257,12 +302,20 @@ private extension LoginViewController {
         setLeftPaddingView(textField: passwordTextField)
         passwordTextField.rightView = createShowPasswordButton()
         passwordTextField.rightViewMode = .always
+
+        #if DEBUG
+        passwordTextField.text = "password1"
+        #endif
     }
 
     func setupEmailTextField() {
         setBottomLine(textField: emailTextField)
         setLeftPaddingView(textField: emailTextField)
         setRightPaddingView(textField: emailTextField)
+
+        #if DEBUG
+        emailTextField.text = "mateo.puhalovic@test.com"
+        #endif
     }
 
     func setBottomLine(textField: UITextField, height: CGFloat = 1.0) {

@@ -11,14 +11,14 @@ import Alamofire
 class LoginManager {
     
     let networkManager = NetworkManager.sharedInstance
-    
-    func login(email: String, password: String, onResult: @escaping (Result<UserResponse, Error>) -> Void) {
+
+    func login(email: String, password: String, onResult: @escaping (Result<(UserResponse, [String: String]?), Error>) -> Void) {
         let type = LoginEndPointType(email: email, password: password)
         
         networkManager.call(type: type, onResult: onResult)
     }
-    
-    func register(email: String, password: String, onResult: @escaping (Result<UserResponse, Error>) -> Void) {
+
+    func register(email: String, password: String, onResult: @escaping (Result<(UserResponse, [String: String]?), Error>) -> Void) {
         let type = RegisterEndPointType(email: email, password: password)
         
         networkManager.call(type: type, onResult: onResult)
@@ -29,7 +29,7 @@ class LoginEndPointType : EndPointType {
 
     let email: String
     let password: String
-    var params: [String: String]
+    var params: [String: String]?
 
     init(email: String, password: String) {
         self.email = email
@@ -49,7 +49,7 @@ class RegisterEndPointType : EndPointType {
 
     let email: String
     let password: String
-    var params: [String: String]
+    var params: [String: String]?
 
     init(email: String, password: String) {
         self.email = email

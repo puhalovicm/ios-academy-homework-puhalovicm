@@ -4,8 +4,8 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -17,20 +17,58 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HOME" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QHP-ac-bKc">
-                                <rect key="frame" x="119" y="412" width="176.5" height="72"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="60"/>
-                                <color key="textColor" name="Purple"/>
-                                <color key="highlightedColor" name="Purple"/>
-                            </label>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="08M-N4-dFz">
+                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="TVShowTableViewCell" rowHeight="120" id="g8R-IE-562" customClass="TVShowTableViewCell" customModule="TV_Shows" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="24.5" width="414" height="120"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="g8R-IE-562" id="4vd-cO-pPj">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="120"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icImagePlaceholder" translatesAutoresizingMaskIntoConstraints="NO" id="daH-2B-EbG">
+                                                    <rect key="frame" x="20" y="15" width="66" height="90"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" priority="999" constant="90" id="rAM-8L-E8q"/>
+                                                        <constraint firstAttribute="width" constant="66" id="wpz-5v-15S"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="73a-SV-FQq">
+                                                    <rect key="frame" x="108" y="50" width="41.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="73a-SV-FQq" firstAttribute="centerY" secondItem="4vd-cO-pPj" secondAttribute="centerY" id="57W-Om-Dge"/>
+                                                <constraint firstItem="daH-2B-EbG" firstAttribute="leading" secondItem="4vd-cO-pPj" secondAttribute="leading" constant="20" id="5ke-cH-55l"/>
+                                                <constraint firstItem="73a-SV-FQq" firstAttribute="leading" secondItem="daH-2B-EbG" secondAttribute="trailing" constant="22" id="9kl-gn-Abj"/>
+                                                <constraint firstItem="daH-2B-EbG" firstAttribute="centerY" secondItem="4vd-cO-pPj" secondAttribute="centerY" id="U4v-p1-a5K"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="thumbnailImageView" destination="daH-2B-EbG" id="YvK-Kj-1pr"/>
+                                            <outlet property="titleLabel" destination="73a-SV-FQq" id="pow-Br-M38"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="QHP-ac-bKc" firstAttribute="centerY" secondItem="5EZ-qb-Rvc" secondAttribute="centerY" id="5XP-fA-LHZ"/>
-                            <constraint firstItem="QHP-ac-bKc" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="hbt-a8-obh"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="08M-N4-dFz" secondAttribute="trailing" id="HUc-3i-J7C"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="08M-N4-dFz" secondAttribute="bottom" id="SuH-Me-zV8"/>
+                            <constraint firstItem="08M-N4-dFz" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" id="dnG-UA-biq"/>
+                            <constraint firstItem="08M-N4-dFz" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="rc5-hl-TeA"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="showsTableView" destination="08M-N4-dFz" id="mhw-9P-DkO"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -38,8 +76,9 @@
         </scene>
     </scenes>
     <resources>
-        <namedColor name="Purple">
-            <color red="0.32156862745098042" green="0.21176470588235294" blue="0.5490196078431373" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
+        <image name="icImagePlaceholder" width="600" height="400"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>
