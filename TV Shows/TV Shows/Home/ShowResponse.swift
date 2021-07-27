@@ -13,7 +13,7 @@ struct Show: Codable {
     let description: String?
     let imageUrl: String?
     let noOfReviews: Int?
-    let title: String?
+    let title: String
     
      enum CodingKeys: String, CodingKey {
         case id = "id"

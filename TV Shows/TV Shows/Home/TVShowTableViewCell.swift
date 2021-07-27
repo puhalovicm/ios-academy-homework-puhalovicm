@@ -37,7 +37,7 @@ extension TVShowTableViewCell {
 
     func configure(with item: TVShowItem) {
         thumbnailImageView.kf.setImage(
-            with: item.image,
+            with: URL(string: item.imageUrl ?? ""),
             placeholder: UIImage(named: "icImagePlaceholder")
         )
 
