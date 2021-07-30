@@ -9,7 +9,11 @@ import Foundation
 import Alamofire
 
 class LoginManager {
-    
+
+    static let sharedInstance = LoginManager()
+
+    private init() { }
+
     let networkManager = NetworkManager.sharedInstance
 
     func login(email: String, password: String, onResult: @escaping (Result<(UserResponse, [String: String]?), Error>) -> Void) {

@@ -26,7 +26,7 @@ final class HomeViewController: UIViewController {
 
     // MARK: - Private
 
-    private let homeManager: HomeManager = HomeManager()
+    private let homeManager: HomeManager = HomeManager.sharedInstance
     private var items: [TVShowItem] = []
     private var currentPage = 1
 
@@ -117,10 +117,26 @@ private extension HomeViewController {
     func mapShowsToItems(shows: [Show]) -> [TVShowItem] {
         return shows.map { show in
             TVShowItem(
+                showId: show.id,
                 name: show.title,
-                imageUrl: show.imageUrl
+                imageUrl: show.imageUrl,
+                show: show
             )
         }
+    }
+
+    func showDetailsScreen(item: TVShowItem) {
+        let vc = UIStoryboard.init(name: "ShowDetails", bundle: Bundle.main).instantiateViewController(withIdentifier: "ShowDetailsViewController") as! ShowDetailsViewController
+
+        guard let authInfo = authInfo else {
+            return
+        }
+
+        vc.authInfo = authInfo
+        vc.showId = item.showId
+        vc.show = item.show
+
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -133,6 +149,7 @@ extension HomeViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         showsTableView.deselectRow(at: indexPath, animated: true)
         let item = items[indexPath.row]
+        showDetailsScreen(item: item)
     }
 }
 

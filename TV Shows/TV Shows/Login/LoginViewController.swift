@@ -26,7 +26,7 @@ final class LoginViewController: UIViewController {
     private var rememberMeSelected: Bool = false
     private var showPassword: Bool = false
     
-    private var loginManager: LoginManager = LoginManager()
+    private var loginManager: LoginManager = LoginManager.sharedInstance
 
     private var user: UserResponse? = nil
     private var authInfo: AuthInfo? = nil
@@ -273,29 +273,6 @@ private extension LoginViewController {
 
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    func showErrorAlert(
-        title: String = "Error occurred",
-        message: String = "Error occurred! Please try again later."
-    ) {
-        let alert = UIAlertController(
-            title: title,
-            message: message,
-            preferredStyle: .alert
-        )
-
-        alert.addAction(
-            UIAlertAction(
-                title: "Ok",
-                style: .default,
-                handler: { _ in
-                    // NO - OP
-                }
-            )
-        )
-
-        self.present(alert, animated: true, completion: nil)
-    }
 
     func setupPasswordTextField() {
         setBottomLine(textField: passwordTextField)
@@ -361,11 +338,7 @@ private extension LoginViewController {
     var isInputValid: Bool {
         !email.isEmpty && !password.isEmpty
     }
-
-    func printMessage() {
-        print("Button clicked!")
-    }
-
+    
     func setupButtons() {
         loginButton.layer.cornerRadius = 25
 

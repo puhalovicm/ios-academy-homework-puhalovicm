@@ -10,6 +10,10 @@ import Foundation
 import Alamofire
 
 class HomeManager {
+
+    static let sharedInstance = HomeManager()
+
+    private init() { }
     
     let networkManager = NetworkManager.sharedInstance
     
