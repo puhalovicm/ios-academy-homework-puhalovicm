@@ -9,7 +9,7 @@ import Foundation
 
 struct Show: Codable {
     let id: String
-    let averageRating: Int?
+    let averageRating: Double?
     let description: String?
     let imageUrl: String?
     let noOfReviews: Int?

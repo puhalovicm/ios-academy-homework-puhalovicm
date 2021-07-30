@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 struct TVShowItem {
+    let showId: String
     let name: String
     let imageUrl: String?
+    let show: Show
 }

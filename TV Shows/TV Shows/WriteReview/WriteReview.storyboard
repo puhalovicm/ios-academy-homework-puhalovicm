@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Write Review View Controller-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="WriteReviewViewController" id="Y6W-OH-hqX" customClass="WriteReviewViewController" customModule="TV_Shows" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rating" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CQy-h7-ldg">
+                                <rect key="frame" x="20" y="74" width="374" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" name="BlackMediumOpacity"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="I8q-zE-vIJ" customClass="RatingView" customModule="TV_Shows" customModuleProvider="target">
+                                <rect key="frame" x="20" y="110" width="374" height="40"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="cu3-KJ-nrt"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comment" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kTE-fD-1nt">
+                                <rect key="frame" x="20" y="180" width="374" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" name="BlackMediumOpacity"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="EYY-JE-uUF">
+                                <rect key="frame" x="20" y="216" width="374" height="196"/>
+                                <color key="backgroundColor" name="Gray2"/>
+                                <accessibility key="accessibilityConfiguration" hint="Enter your comment here..." label="Entter here"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="196" id="IwN-kx-KeD"/>
+                                </constraints>
+                                <color key="textColor" name="BlackMediumOpacity"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7Zd-17-PP8">
+                                <rect key="frame" x="20" y="442" width="374" height="48"/>
+                                <color key="backgroundColor" name="Purple"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="48" id="aJj-iR-85O"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <state key="normal" title="Submit">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="writeReview:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="fxM-8U-YfN"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="EYY-JE-uUF" firstAttribute="top" secondItem="kTE-fD-1nt" secondAttribute="bottom" constant="15" id="5Lz-Uq-FbP"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="7Zd-17-PP8" secondAttribute="trailing" constant="20" id="7nJ-M0-EKu"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="I8q-zE-vIJ" secondAttribute="trailing" constant="20" id="Lt4-m9-te4"/>
+                            <constraint firstItem="EYY-JE-uUF" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="PiG-ia-ME5"/>
+                            <constraint firstItem="I8q-zE-vIJ" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="UFB-eB-SPb"/>
+                            <constraint firstItem="kTE-fD-1nt" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="WMr-JL-EbQ"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="CQy-h7-ldg" secondAttribute="trailing" constant="20" id="XrZ-Le-hhT"/>
+                            <constraint firstItem="CQy-h7-ldg" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="30" id="Y3m-ve-QyI"/>
+                            <constraint firstItem="7Zd-17-PP8" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="ZEL-gA-zEx"/>
+                            <constraint firstItem="I8q-zE-vIJ" firstAttribute="top" secondItem="CQy-h7-ldg" secondAttribute="bottom" constant="15" id="lZ1-EE-Ww7"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="kTE-fD-1nt" secondAttribute="trailing" constant="20" id="mJl-en-fMg"/>
+                            <constraint firstItem="kTE-fD-1nt" firstAttribute="top" secondItem="I8q-zE-vIJ" secondAttribute="bottom" constant="30" id="pth-4F-lmL"/>
+                            <constraint firstItem="7Zd-17-PP8" firstAttribute="top" secondItem="EYY-JE-uUF" secondAttribute="bottom" constant="30" id="rPy-0E-vCU"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="EYY-JE-uUF" secondAttribute="trailing" constant="20" id="yki-hK-Gnb"/>
+                            <constraint firstItem="CQy-h7-ldg" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="zEU-dP-fNg"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="commentTextView" destination="EYY-JE-uUF" id="Nr9-TJ-yx0"/>
+                        <outlet property="ratingView" destination="I8q-zE-vIJ" id="squ-cY-E5t"/>
+                        <outlet property="submitReviewButton" destination="7Zd-17-PP8" id="mXv-y8-4mX"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="46" y="41"/>
+        </scene>
+    </scenes>
+    <resources>
+        <namedColor name="BlackMediumOpacity">
+            <color red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Gray2">
+            <color red="0.84705882352941175" green="0.84705882352941175" blue="0.84705882352941175" alpha="0.14999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="Purple">
+            <color red="0.32156862745098042" green="0.21176470588235294" blue="0.5490196078431373" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
