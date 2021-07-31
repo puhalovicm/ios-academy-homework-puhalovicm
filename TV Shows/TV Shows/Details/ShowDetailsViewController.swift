@@ -19,12 +19,12 @@ final class ShowDetailsViewController: UIViewController {
         }
     }
 
-    @IBOutlet weak var detailsTableView: UITableView!
-    @IBOutlet weak var writeReviewButton: UIButton!
-
     var showId: String? = nil
     var authInfo: AuthInfo? = nil
     var show: Show? = nil
+
+    @IBOutlet private weak var detailsTableView: UITableView!
+    @IBOutlet private weak var writeReviewButton: UIButton!
 
     // MARK: - Private
 
@@ -32,13 +32,12 @@ final class ShowDetailsViewController: UIViewController {
     private var items: [Review] = []
     private var currentPage = 1
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupNavigationBar()
         setupStatusBar()
-        fetchShowsAndUpdate()
+        fetchReviewsAndUpdate()
         setupTableView()
         writeReviewButton.layer.cornerRadius = 25
     }
@@ -47,8 +46,8 @@ final class ShowDetailsViewController: UIViewController {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
 
-        if (offsetY > contentHeight - scrollView.frame.height * 2) && !SVProgressHUD.isVisible() {
-            fetchShowsAndUpdate()
+        if (offsetY > contentHeight - scrollView.frame.height) && !SVProgressHUD.isVisible() {
+            fetchReviewsAndUpdate()
         }
     }
 
@@ -75,22 +74,7 @@ private extension ShowDetailsViewController {
         self.title = show?.title
     }
 
-    func setupStatusBar() {
-        if #available(iOS 13, *)
-        {
-            let statusBar = UIView(frame: (UIApplication.shared.keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
-            statusBar.backgroundColor = UIColor(named: "Gray")
-            UIApplication.shared.keyWindow?.addSubview(statusBar)
-        } else {
-           // ADD THE STATUS BAR AND SET A CUSTOM COLOR
-           let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
-           if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
-              statusBar.backgroundColor = UIColor(named: "Gray")
-           }
-        }
-    }
-
-    func fetchShowsAndUpdate() {
+    func fetchReviewsAndUpdate() {
         SVProgressHUD.show()
 
         guard
@@ -121,24 +105,11 @@ private extension ShowDetailsViewController {
             }
         }
     }
-
-    func mapShowsToItems(shows: [Show]) -> [TVShowItem] {
-        return shows.map { show in
-            TVShowItem(
-                showId: show.id,
-                name: show.title,
-                imageUrl: show.imageUrl,
-                show: show
-            )
-        }
-    }
 }
 
 // MARK: - UITableView
 
-extension ShowDetailsViewController: UITableViewDelegate {
-
-}
+extension ShowDetailsViewController: UITableViewDelegate { }
 
 extension ShowDetailsViewController: UITableViewDataSource {
 
@@ -158,6 +129,18 @@ extension ShowDetailsViewController: UITableViewDataSource {
         } else {
             return createReviewViewCell(tableView: tableView, indexPath: indexPath)
         }
+    }
+}
+
+// MARK: - Private
+
+private extension ShowDetailsViewController {
+
+    func setupTableView() {
+        detailsTableView.rowHeight = UITableView.automaticDimension
+        detailsTableView.tableFooterView = UIView()
+        detailsTableView.delegate = self
+        detailsTableView.dataSource = self
     }
 
     func createDetailsTopPartViewCell(tableView: UITableView, indexPath: IndexPath) -> ShowDetailsTopTableViewCell {
@@ -183,25 +166,12 @@ extension ShowDetailsViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - Private
-
-private extension ShowDetailsViewController {
-
-    func setupTableView() {
-        detailsTableView.estimatedRowHeight = 120
-        detailsTableView.rowHeight = UITableView.automaticDimension
-        detailsTableView.tableFooterView = UIView()
-        detailsTableView.delegate = self
-        detailsTableView.dataSource = self
-    }
-}
-
 extension ShowDetailsViewController: WriteReviewViewControllerDelegate {
 
     func onSuccessfulRatingSubmit() {
-        currentPage = 0
+        currentPage = 1
         items = []
         detailsTableView.reloadData()
-        fetchShowsAndUpdate()
+        fetchReviewsAndUpdate()
     }
 }

@@ -12,10 +12,10 @@ final class ShowDetailsTopTableViewCell: UITableViewCell {
 
     // MARK: - Private UI
 
-    @IBOutlet weak var showImage: UIImageView!
-    @IBOutlet weak var descriptionLabel: UILabel!
-    @IBOutlet weak var ratingOverviewLabel: UILabel!
-    @IBOutlet weak var overviewRatingView: RatingView!
+    @IBOutlet private weak var showImage: UIImageView!
+    @IBOutlet private weak var descriptionLabel: UILabel!
+    @IBOutlet private weak var ratingOverviewLabel: UILabel!
+    @IBOutlet private weak var overviewRatingView: RatingView!
 
     // MARK: - Lifecycle
     override func awakeFromNib() {
@@ -46,19 +46,17 @@ extension ShowDetailsTopTableViewCell {
             with: URL(string: item.imageUrl ?? ""),
             placeholder: UIImage(named: "icImagePlaceholder")
         )
-
         descriptionLabel.text = item.description
-
         overviewRatingView.setRoundedRating(Double(item.averageRating ?? 0))
 
         if
             let noOfReviews = item.noOfReviews,
-            noOfReviews > 1 {
-            ratingOverviewLabel.textAlignment = .left
-            ratingOverviewLabel.text = (String(noOfReviews) + " reviews, " + String(item.averageRating ?? 0) + " average").uppercased()
+            noOfReviews > 1,
+            let averageRating = item.averageRating
+        {
+            showReviewOverviewLabel(noOfReviews: noOfReviews, averageRating: averageRating)
         } else {
-            ratingOverviewLabel.textAlignment = .center
-            ratingOverviewLabel.text = "No reviews yet."
+            showNoReviewsLabel()
         }
     }
 }
@@ -72,5 +70,15 @@ private extension ShowDetailsTopTableViewCell {
         showImage.layer.masksToBounds = true
         descriptionLabel.numberOfLines = 0
         selectionStyle = .none
+    }
+
+    func showReviewOverviewLabel(noOfReviews: Int, averageRating: Double) {
+        ratingOverviewLabel.textAlignment = .left
+        ratingOverviewLabel.text = (String(noOfReviews) + " reviews, " + String(averageRating) + " average").uppercased()
+    }
+
+    func showNoReviewsLabel() {
+        ratingOverviewLabel.textAlignment = .center
+        ratingOverviewLabel.text = "No reviews yet."
     }
 }

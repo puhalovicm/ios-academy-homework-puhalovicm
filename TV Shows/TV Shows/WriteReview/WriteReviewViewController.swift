@@ -15,48 +15,32 @@ protocol WriteReviewViewControllerDelegate: AnyObject {
 
 class WriteReviewViewController: UIViewController {
 
-    @IBOutlet weak var ratingView: RatingView!
-    @IBOutlet weak var commentTextView: UITextView!
-    @IBOutlet weak var submitReviewButton: UIButton!
-
     var delegate: WriteReviewViewControllerDelegate? = nil
 
     var showId: String? = nil
     var authInfo: AuthInfo? = nil
 
+    @IBOutlet private weak var ratingView: RatingView!
+    @IBOutlet private weak var commentTextView: UITextView!
+    @IBOutlet private weak var submitReviewButton: UIButton!
+
     private var rating: Int? = nil
     private var comment: String = ""
-
     private let reviewManager: ReviewManager = ReviewManager.sharedInstance
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        submitReviewButton.layer.cornerRadius = 25
-        commentTextView.layer.cornerRadius = 10
-        commentTextView.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        setupNavigationItem()
+        setupSubmitButton()
+        setupCommentTextView()
 
-        submitReviewButton.setTitleColor(UIColor.white.withAlphaComponent(0.4), for: .disabled)
-        submitReviewButton.setTitleColor(UIColor.white, for: .normal)
-
-        navigationItem.title = "Write a Review"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "Close",
-            style: .plain,
-            target: self,
-            action: #selector(didSelectClose)
-        )
-
-        commentTextView.delegate = self
         ratingView.delegate = self
-
-        setButtonsEnabled(isEnabled: false)
     }
 
     @objc private func didSelectClose() {
         dismiss(animated: true, completion: nil)
     }
-
 
     @IBAction func writeReview(_ sender: Any) {
         guard
@@ -71,6 +55,40 @@ class WriteReviewViewController: UIViewController {
 
         submitReview(showId: showId, authInfo: authInfo, rating: rating, comment: comment)
         view.endEditing(true)
+    }
+}
+
+extension WriteReviewViewController: UITextViewDelegate {
+
+    func textViewDidChange(_ textView: UITextView) {
+        self.comment = textView.text
+        setSubmitButtonEnabled(isEnabled: isInputValid)
+    }
+}
+
+private extension WriteReviewViewController {
+
+    func setupSubmitButton() {
+        submitReviewButton.layer.cornerRadius = 25
+        submitReviewButton.setTitleColor(UIColor.white.withAlphaComponent(0.4), for: .disabled)
+        submitReviewButton.setTitleColor(UIColor.white, for: .normal)
+        setSubmitButtonEnabled(isEnabled: false)
+    }
+
+    func setupNavigationItem() {
+        navigationItem.title = "Write a Review"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "Close",
+            style: .plain,
+            target: self,
+            action: #selector(didSelectClose)
+        )
+    }
+
+    func setupCommentTextView() {
+        commentTextView.layer.cornerRadius = 10
+        commentTextView.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        commentTextView.delegate = self
     }
 
     func submitReview(showId: String, authInfo: AuthInfo, rating: Int, comment: String) {
@@ -93,19 +111,8 @@ class WriteReviewViewController: UIViewController {
         SVProgressHUD.dismiss()
         showErrorAlert(message: "Please enter username and password.")
     }
-}
 
-extension WriteReviewViewController: UITextViewDelegate {
-
-    func textViewDidChange(_ textView: UITextView) {
-        self.comment = textView.text
-        setButtonsEnabled(isEnabled: isInputValid)
-    }
-}
-
-private extension WriteReviewViewController {
-
-    func setButtonsEnabled(isEnabled: Bool) {
+    func setSubmitButtonEnabled(isEnabled: Bool) {
         submitReviewButton.isEnabled = isEnabled
         if isEnabled {
             submitReviewButton.backgroundColor = UIColor(named: "Purple")
@@ -123,6 +130,6 @@ extension WriteReviewViewController: RatingViewDelegate {
 
     func didChangeRating(_ rating: Int) {
         self.rating = rating
-        setButtonsEnabled(isEnabled: isInputValid)
+        setSubmitButtonEnabled(isEnabled: isInputValid)
     }
 }

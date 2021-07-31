@@ -32,4 +32,19 @@ extension UIViewController {
 
         self.present(alert, animated: true, completion: nil)
     }
+
+    func setupStatusBar() {
+        if #available(iOS 13, *)
+        {
+            let statusBar = UIView(frame: (UIApplication.shared.keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+            statusBar.backgroundColor = UIColor(named: "Gray")
+            UIApplication.shared.keyWindow?.addSubview(statusBar)
+        } else {
+           // ADD THE STATUS BAR AND SET A CUSTOM COLOR
+           let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+           if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
+              statusBar.backgroundColor = UIColor(named: "Gray")
+           }
+        }
+    }
 }

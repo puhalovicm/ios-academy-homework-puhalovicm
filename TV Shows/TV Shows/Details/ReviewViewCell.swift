@@ -12,10 +12,10 @@ final class ReviewViewCell: UITableViewCell {
 
     // MARK: - Private UI
 
-    @IBOutlet weak var profileImage: UIImageView!
-    @IBOutlet weak var emailLabel: UILabel!
-    @IBOutlet weak var ratingView: RatingView!
-    @IBOutlet weak var reviewLabel: UILabel!
+    @IBOutlet private weak var profileImage: UIImageView!
+    @IBOutlet private weak var emailLabel: UILabel!
+    @IBOutlet private weak var ratingView: RatingView!
+    @IBOutlet private weak var reviewLabel: UILabel!
 
     // MARK: - Lifecycle
     override func awakeFromNib() {
@@ -48,10 +48,8 @@ extension ReviewViewCell {
             placeholder: UIImage(named: "ic-profile-placeholder")
         )
 
-        emailLabel.text = item.user.email
-        ratingView.rating = item.rating
         reviewLabel.text = item.comment
-
+        
         ratingView.setRoundedRating(Double(item.rating))
     }
 }
