@@ -46,7 +46,7 @@ final class ShowDetailsViewController: UIViewController {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
 
-        if (offsetY > contentHeight - scrollView.frame.height) && !SVProgressHUD.isVisible() {
+        if (offsetY > contentHeight - scrollView.frame.height * 2) && !SVProgressHUD.isVisible() {
             fetchReviewsAndUpdate()
         }
     }
@@ -67,11 +67,12 @@ final class ShowDetailsViewController: UIViewController {
 private extension ShowDetailsViewController {
 
     func setupNavigationBar() {
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.isNavigationBarHidden = false
-        self.navigationItem.hidesBackButton = false
-        self.navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
-        self.title = show?.title
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.isNavigationBarHidden = false
+        navigationItem.hidesBackButton = false
+        navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
+        title = show?.title
+        navigationController?.navigationBar.tintColor = UIColor(named: "Purple")
     }
 
     func fetchReviewsAndUpdate() {
@@ -95,6 +96,14 @@ private extension ShowDetailsViewController {
             case .success (let showResponse):
                 let reviews = showResponse.0.reviews
                 let meta = showResponse.0.meta
+
+                guard
+                    let fetchedPage = meta.pagination.page,
+                    let currentPage = self?.currentPage,
+                    fetchedPage == currentPage
+                else {
+                    return
+                }
 
                 self?.items += reviews
                 self?.currentPage = (meta.pagination.page ?? self?.currentPage ?? 0) + 1

@@ -15,6 +15,14 @@ protocol WriteReviewViewControllerDelegate: AnyObject {
 
 class WriteReviewViewController: UIViewController {
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        if #available(iOS 13.0, *) {
+            return .darkContent
+        } else {
+            return .default
+        }
+    }
+
     var delegate: WriteReviewViewControllerDelegate? = nil
 
     var showId: String? = nil
@@ -23,6 +31,7 @@ class WriteReviewViewController: UIViewController {
     @IBOutlet private weak var ratingView: RatingView!
     @IBOutlet private weak var commentTextView: UITextView!
     @IBOutlet private weak var submitReviewButton: UIButton!
+    @IBOutlet private weak var scrollView: UIScrollView!
 
     private var rating: Int? = nil
     private var comment: String = ""
@@ -34,8 +43,64 @@ class WriteReviewViewController: UIViewController {
         setupNavigationItem()
         setupSubmitButton()
         setupCommentTextView()
+        hideKeyboardWhenTappedAround()
 
         ratingView.delegate = self
+
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+
+        commentTextView.text = "Enter your comment here..."
+        commentTextView.textColor = UIColor(named: "BlackMediumOpacity")
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    @objc func keyboardWillShow(notification: NSNotification) {
+        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+        else {
+            // if keyboard size is not available for some reason, dont do anything
+            return
+        }
+
+        let contentInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: keyboardSize.height, right: 0.0)
+        scrollView.contentInset = contentInsets
+        scrollView.scrollIndicatorInsets = contentInsets
+
+        if let frame = commentTextView.superview?.convert(commentTextView.frame, to: nil) {
+            let frameBottom = frame.origin.y + frame.size.height
+            let keyboardTop = keyboardSize.origin.y
+
+            let diff = keyboardTop - frameBottom - 20
+
+            if diff < 0 {
+                scrollView.setContentOffset(CGPoint(x: 0.0, y: -diff), animated: true)
+            }
+        }
+    }
+
+    @objc func keyboardWillHide(notification: NSNotification) {
+        let contentInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+
+        scrollView.contentInset = contentInsets
+        scrollView.scrollIndicatorInsets = contentInsets
+
+        scrollView.setContentOffset(CGPoint(x: 0.0, y: 0.0), animated: true)
+    }
+
+    func hideKeyboardWhenTappedAround() {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(hideKeyboard)
+        )
+        view.addGestureRecognizer(tapGesture)
+    }
+
+    @objc func hideKeyboard() {
+        view.endEditing(true)
     }
 
     @objc private func didSelectClose() {
@@ -64,6 +129,20 @@ extension WriteReviewViewController: UITextViewDelegate {
         self.comment = textView.text
         setSubmitButtonEnabled(isEnabled: isInputValid)
     }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor(named: "BlackMediumOpacity") {
+            textView.text = nil
+            textView.textColor = UIColor.black
+        }
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Enter your comment here..."
+            textView.textColor = UIColor(named: "BlackMediumOpacity")
+        }
+    }
 }
 
 private extension WriteReviewViewController {
@@ -83,6 +162,10 @@ private extension WriteReviewViewController {
             target: self,
             action: #selector(didSelectClose)
         )
+
+        navigationController?.navigationBar.barTintColor = UIColor(named: "Gray")
+        navigationController?.navigationBar.tintColor = UIColor(named: "Purple")
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
     }
 
     func setupCommentTextView() {

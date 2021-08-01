@@ -62,5 +62,6 @@ private extension ReviewViewCell {
         profileImage.layer.cornerRadius = 25
         profileImage.layer.masksToBounds = true
         selectionStyle = .none
+        reviewLabel.numberOfLines = 0
     }
 }

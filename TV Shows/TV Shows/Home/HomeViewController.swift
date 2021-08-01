@@ -54,21 +54,27 @@ final class HomeViewController: UIViewController {
 private extension HomeViewController {
 
     func setupNavigationBar() {
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.isNavigationBarHidden = false
-        self.navigationItem.hidesBackButton = true
-        self.navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
-        self.title = "Shows"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.isNavigationBarHidden = false
+        navigationItem.hidesBackButton = true
+        navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
+        title = "Shows"
     }
 
     func setupProfileButton() {
-        if #available(iOS 14.0, *) {
-            let segmentBarItem = UIBarButtonItem(image: UIImage(named: "ic-profile"))
-            segmentBarItem.tintColor = UIColor(named: "Purple")
-            navigationItem.rightBarButtonItem = segmentBarItem
-        } else {
-            // Fallback on earlier versions
-        }
+        let segmentBarItem = UIBarButtonItem(
+            image: UIImage(named: "ic-profile"),
+            style: .plain,
+            target: self,
+            action: #selector(didSelectProfileIcon)
+        )
+        segmentBarItem.tintColor = UIColor(named: "Purple")
+
+        navigationItem.rightBarButtonItem = segmentBarItem
+    }
+
+    @objc private func didSelectProfileIcon() {
+        // TODO
     }
 
     func fetchShowsAndUpdate() {
