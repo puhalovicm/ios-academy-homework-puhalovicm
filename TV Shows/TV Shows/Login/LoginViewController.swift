@@ -52,7 +52,7 @@ final class LoginViewController: UIViewController {
         loginButton.isEnabled = true
         registerButton.isEnabled = true
         email = "mateo.puhalovic@test.com"
-        password = "password1"
+        password = "password2"
         #endif
     }
     
@@ -64,6 +64,26 @@ final class LoginViewController: UIViewController {
 }
 
 private extension LoginViewController {
+
+    func pulsateTextfields() {
+//        UIView.animate(
+//            withDuration: 2.0,
+//            delay: 0.0,
+//            usingSpringWithDamping: 0.3,
+//            initialSpringVelocity: 0.0,
+//            options: [.autoreverse],
+//            animations: {
+//                self.emailTextField.transform = CGAffineTransform(translationX: 100.0, y: 0.0)
+//            }
+//        )
+
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
+        animation.duration = 0.6
+        animation.values = [-20.0, 20.0, -20.0, 20.0, -10.0, 10.0, -5.0, 5.0, 0.0 ]
+        animation.delegate = self
+        passwordTextField.layer.add(animation, forKey: "shake")
+    }
 
     func delayedAction(duration: Double = defaultMessageDuration, action: @escaping () -> ()) {
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -205,6 +225,8 @@ private extension LoginViewController {
             email: email,
             password: password
         ) { [weak self] result in
+            SVProgressHUD.dismiss()
+
             guard let self = self else { return }
 
             switch result {
@@ -213,12 +235,16 @@ private extension LoginViewController {
 
                 if let headers = user.1 {
                     self.authInfo = AuthInfo(headers: headers)
+
+                    if self.rememberMeSelected {
+                        KeychainService.sharedInstance.saveAuthInfo(authInfo: AuthInfo(headers: headers))
+                    }
                 }
                 
                 self.showSuccessMessage()
                 self.showHomeViewController()
             case .failure:
-                self.showNetworkErrorMessage()
+                self.pulsateTextfields()
             }
         }
     }
@@ -238,6 +264,10 @@ private extension LoginViewController {
 
                 if let headers = user.1 {
                     self.authInfo = AuthInfo(headers: headers)
+
+                    if self.rememberMeSelected {
+                        KeychainService.sharedInstance.saveAuthInfo(authInfo: AuthInfo(headers: headers))
+                    }
                 }
 
                 self.showSuccessMessage()
@@ -363,5 +393,12 @@ private extension LoginViewController {
         let imageName = isSelected ? "ic-checkbox-selected" : "ic-checkbox-unselected"
         guard let image = UIImage(named: imageName) else { return }
         rememberMeButton.setImage(image, for: .normal)
+    }
+}
+
+extension LoginViewController: CAAnimationDelegate {
+
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        self.showNetworkErrorMessage()
     }
 }

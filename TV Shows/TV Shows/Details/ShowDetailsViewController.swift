@@ -43,6 +43,7 @@ final class ShowDetailsViewController: UIViewController {
         fetchReviewsAndUpdate()
         setupTableView()
         writeReviewButton.layer.cornerRadius = 25
+        configureRefreshControl()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -63,6 +64,26 @@ final class ShowDetailsViewController: UIViewController {
 }
 
 private extension ShowDetailsViewController {
+
+    func configureRefreshControl() {
+        detailsTableView.refreshControl = UIRefreshControl()
+        detailsTableView.refreshControl?.addTarget(
+            self,
+            action: #selector(handleRefreshControl),
+            for: .valueChanged
+        )
+    }
+
+    @objc func handleRefreshControl() {
+        resetReviewData()
+    }
+
+    func resetReviewData() {
+        currentPage = 1
+        items = []
+        detailsTableView.reloadData()
+        fetchReviewsAndUpdate()
+    }
 
     func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -98,6 +119,11 @@ private extension ShowDetailsViewController {
 
             self.hideActivityIndicatorFooter()
             self.isLoading = false
+
+            // Dismiss the refresh control.
+            DispatchQueue.main.async {
+               self.detailsTableView.refreshControl?.endRefreshing()
+            }
 
             switch result {
             case .success (let showResponse):
@@ -219,9 +245,6 @@ private extension ShowDetailsViewController {
 extension ShowDetailsViewController: WriteReviewViewControllerDelegate {
 
     func onSuccessfulRatingSubmit() {
-        currentPage = 1
-        items = []
-        detailsTableView.reloadData()
-        fetchReviewsAndUpdate()
+        resetReviewData()
     }
 }
