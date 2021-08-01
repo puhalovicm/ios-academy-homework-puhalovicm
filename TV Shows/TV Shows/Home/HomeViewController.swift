@@ -22,14 +22,16 @@ final class HomeViewController: UIViewController {
     var userResponse: UserResponse? = nil
     var authInfo: AuthInfo? = nil
 
+    private var activtiyIndicatorFooter: UIActivityIndicatorView? = nil
     @IBOutlet weak var showsTableView: UITableView!
 
     // MARK: - Private
 
-    private let homeManager: HomeManager = HomeManager.sharedInstance
+    private let homeService: HomeService = HomeService.sharedInstance
     private var items: [TVShowItem] = []
     private var currentPage = 1
-
+    private var pages: Int? = nil
+    private var isLoading = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,14 +42,10 @@ final class HomeViewController: UIViewController {
         setupTableView()
         fetchShowsAndUpdate()
     }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
 
-        if (offsetY > contentHeight - scrollView.frame.height * 2) && !SVProgressHUD.isVisible() {
-            fetchShowsAndUpdate()
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 }
 
@@ -55,7 +53,6 @@ private extension HomeViewController {
 
     func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.isNavigationBarHidden = false
         navigationItem.hidesBackButton = true
         navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
         title = "Shows"
@@ -78,27 +75,46 @@ private extension HomeViewController {
     }
 
     func fetchShowsAndUpdate() {
-        SVProgressHUD.show()
-
-        guard let headers = authInfo?.headers else {
+        guard
+            let headers = authInfo?.headers
+        else {
             return
         }
 
-        homeManager.fetchShows(
+        if
+            let pages = pages,
+            currentPage > pages {
+            return
+        }
+
+        showActivityIndicatorFooter()
+        isLoading = true
+        
+        homeService.fetchShows(
             page: currentPage,
             headers: headers
         ) { [weak self] result in
-            SVProgressHUD.dismiss()
+            guard let self = self else { return }
+
+            self.hideActivityIndicatorFooter()
+            self.isLoading = false
 
             switch result {
             case .success (let showResponse):
                 let shows = showResponse.0.shows
                 let meta = showResponse.0.meta
 
-                self?.items += self?.mapShowsToItems(shows: shows) ?? []
-                self?.currentPage = (meta.pagination.page ?? self?.currentPage ?? 0) + 1
+                guard
+                    meta.pagination.page == self.currentPage
+                else {
+                    return
+                }
 
-                self?.showsTableView.reloadData()
+                self.items += self.mapShowsToItems(shows: shows)
+                self.currentPage = meta.pagination.page + 1
+                self.pages = meta.pagination.pages
+
+                self.showsTableView.reloadData()
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -111,7 +127,10 @@ private extension HomeViewController {
                 showId: show.id,
                 name: show.title,
                 imageUrl: show.imageUrl,
-                show: show
+                showTitle: show.title,
+                showDescription: show.description,
+                noOfReviews: show.noOfReviews,
+                averageRating: show.averageRating
             )
         }
     }
@@ -124,8 +143,7 @@ private extension HomeViewController {
         }
 
         vc.authInfo = authInfo
-        vc.showId = item.showId
-        vc.show = item.show
+        vc.show = item
 
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -142,15 +160,20 @@ extension HomeViewController: UITableViewDelegate {
         let item = items[indexPath.row]
         showDetailsScreen(item: item)
     }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+
+        if (offsetY > contentHeight - scrollView.frame.height * 2) && !isLoading {
+            fetchShowsAndUpdate()
+        }
+    }
 }
 
 extension HomeViewController: UITableViewDataSource {
 
     // MARK: - UITableViewDataSource
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -175,8 +198,36 @@ private extension HomeViewController {
     func setupTableView() {
         showsTableView.estimatedRowHeight = 120
         showsTableView.rowHeight = 120
-        showsTableView.tableFooterView = UIView()
         showsTableView.delegate = self
         showsTableView.dataSource = self
+        showsTableView.tableFooterView = createActivityIndicatorFooter()
+    }
+
+    func createActivityIndicatorFooter() -> UIActivityIndicatorView {
+        let activtiyIndicatorFooter = UIActivityIndicatorView(style: .gray)
+        activtiyIndicatorFooter.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: showsTableView.bounds.width, height: CGFloat(44))
+        activtiyIndicatorFooter.backgroundColor = UIColor(named: "Gray")
+        return activtiyIndicatorFooter
+    }
+
+    func showActivityIndicatorFooter() {
+        if let activtiyIndicatorFooter = activtiyIndicatorFooter {
+            showsTableView.tableFooterView = activtiyIndicatorFooter
+        } else {
+            activtiyIndicatorFooter = createActivityIndicatorFooter()
+            showsTableView.tableFooterView = activtiyIndicatorFooter
+        }
+
+        activtiyIndicatorFooter?.startAnimating()
+        showsTableView.isHidden = false
+        showsTableView.layoutIfNeeded()
+    }
+
+    func hideActivityIndicatorFooter() {
+        activtiyIndicatorFooter?.stopAnimating()
+        showsTableView.tableHeaderView?.frame = CGRect.zero
+        showsTableView.sectionFooterHeight = 0
+        showsTableView.tableFooterView = UIView(frame: CGRect.zero)
+        showsTableView.layoutIfNeeded()
     }
 }

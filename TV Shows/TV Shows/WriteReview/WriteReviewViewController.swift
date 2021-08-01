@@ -23,7 +23,7 @@ class WriteReviewViewController: UIViewController {
         }
     }
 
-    var delegate: WriteReviewViewControllerDelegate? = nil
+    weak var delegate: WriteReviewViewControllerDelegate?
 
     var showId: String? = nil
     var authInfo: AuthInfo? = nil
@@ -35,7 +35,7 @@ class WriteReviewViewController: UIViewController {
 
     private var rating: Int? = nil
     private var comment: String = ""
-    private let reviewManager: ReviewManager = ReviewManager.sharedInstance
+    private let reviewService: ReviewService = ReviewService.sharedInstance
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -177,14 +177,16 @@ private extension WriteReviewViewController {
     func submitReview(showId: String, authInfo: AuthInfo, rating: Int, comment: String) {
         SVProgressHUD.show()
 
-        reviewManager.writeReview(showId: showId, rating: rating, comment: comment, headers: authInfo.headers) { [weak self] result in
+        reviewService.writeReview(showId: showId, rating: rating, comment: comment, headers: authInfo.headers) { [weak self] result in
+            guard let self = self else { return }
+
             switch result {
             case .success:
                 SVProgressHUD.dismiss()
-                self?.delegate?.onSuccessfulRatingSubmit()
-                self?.dismiss(animated: true, completion: nil)
+                self.delegate?.onSuccessfulRatingSubmit()
+                self.dismiss(animated: true, completion: nil)
             case .failure:
-                self?.showErrorAlert(message: "Something went wrong.")
+                self.showErrorAlert(message: "Something went wrong.")
             }
         }
 

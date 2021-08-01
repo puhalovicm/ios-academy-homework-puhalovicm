@@ -40,11 +40,15 @@ extension UIViewController {
             statusBar.backgroundColor = UIColor(named: "Gray")
             UIApplication.shared.keyWindow?.addSubview(statusBar)
         } else {
-           // ADD THE STATUS BAR AND SET A CUSTOM COLOR
-           let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
-           if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
-              statusBar.backgroundColor = UIColor(named: "Gray")
-           }
+            let statusBar: UIView? = UIApplication.shared.value(forKey: "statusBar") as? UIView
+
+            guard let statusBarView = statusBar else {
+                return
+            }
+
+            if statusBarView.responds(to:#selector(setter: UIView.backgroundColor)) {
+                statusBarView.backgroundColor = UIColor(named: "Gray")
+            }
         }
     }
 }

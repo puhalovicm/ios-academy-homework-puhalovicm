@@ -19,18 +19,21 @@ final class ShowDetailsViewController: UIViewController {
         }
     }
 
-    var showId: String? = nil
+    var show: TVShowItem? = nil
     var authInfo: AuthInfo? = nil
-    var show: Show? = nil
 
     @IBOutlet private weak var detailsTableView: UITableView!
     @IBOutlet private weak var writeReviewButton: UIButton!
 
+    private var activtiyIndicatorFooter: UIActivityIndicatorView? = nil
+
     // MARK: - Private
 
-    private let reviewManager: ReviewManager = ReviewManager.sharedInstance
+    private let reviewService: ReviewService = ReviewService.sharedInstance
     private var items: [Review] = []
     private var currentPage = 1
+    private var pages: Int? = nil
+    private var isLoading = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,21 +45,16 @@ final class ShowDetailsViewController: UIViewController {
         writeReviewButton.layer.cornerRadius = 25
     }
 
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-
-        if (offsetY > contentHeight - scrollView.frame.height * 2) && !SVProgressHUD.isVisible() {
-            fetchReviewsAndUpdate()
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     @IBAction func launchReviewWriteScreen(_ sender: Any) {
         let vc = UIStoryboard.init(name: "WriteReview", bundle: Bundle.main).instantiateViewController(withIdentifier: "WriteReviewViewController") as! WriteReviewViewController
 
         vc.authInfo = authInfo
-        vc.showId = show?.id
-
+        vc.showId = show?.showId
         vc.delegate = self
 
         let navigationController = UINavigationController(rootViewController: vc)
@@ -68,29 +66,38 @@ private extension ShowDetailsViewController {
 
     func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.isNavigationBarHidden = false
         navigationItem.hidesBackButton = false
         navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
-        title = show?.title
+        title = show?.showTitle
         navigationController?.navigationBar.tintColor = UIColor(named: "Purple")
     }
 
     func fetchReviewsAndUpdate() {
-        SVProgressHUD.show()
-
         guard
             let headers = authInfo?.headers,
-            let showId = showId
+            let showId = show?.showId
         else {
             return
         }
 
-        reviewManager.fetchReviews(
+        if
+            let pages = pages,
+            currentPage > pages {
+            return
+        }
+
+        showActivityIndicatorFooter()
+        isLoading = true
+
+        reviewService.fetchReviews(
             page: currentPage,
             showId: showId,
             headers: headers
         ) { [weak self] result in
-            SVProgressHUD.dismiss()
+            guard let self = self else { return }
+
+            self.hideActivityIndicatorFooter()
+            self.isLoading = false
 
             switch result {
             case .success (let showResponse):
@@ -98,17 +105,16 @@ private extension ShowDetailsViewController {
                 let meta = showResponse.0.meta
 
                 guard
-                    let fetchedPage = meta.pagination.page,
-                    let currentPage = self?.currentPage,
-                    fetchedPage == currentPage
+                    meta.pagination.page == self.currentPage
                 else {
                     return
                 }
 
-                self?.items += reviews
-                self?.currentPage = (meta.pagination.page ?? self?.currentPage ?? 0) + 1
+                self.items += reviews
+                self.currentPage = meta.pagination.page + 1
+                self.pages = meta.pagination.pages
 
-                self?.detailsTableView.reloadData()
+                self.detailsTableView.reloadData()
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -118,15 +124,21 @@ private extension ShowDetailsViewController {
 
 // MARK: - UITableView
 
-extension ShowDetailsViewController: UITableViewDelegate { }
+extension ShowDetailsViewController: UITableViewDelegate {
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+
+        if (offsetY > contentHeight - scrollView.frame.height * 2) && !isLoading {
+            fetchReviewsAndUpdate()
+        }
+    }
+}
 
 extension ShowDetailsViewController: UITableViewDataSource {
 
     // MARK: - UITableViewDataSource
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count + 1
@@ -150,6 +162,35 @@ private extension ShowDetailsViewController {
         detailsTableView.tableFooterView = UIView()
         detailsTableView.delegate = self
         detailsTableView.dataSource = self
+        detailsTableView.tableFooterView = createActivityIndicatorFooter()
+    }
+
+    func createActivityIndicatorFooter() -> UIActivityIndicatorView {
+        let activtiyIndicatorFooter = UIActivityIndicatorView(style: .gray)
+        activtiyIndicatorFooter.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: detailsTableView.bounds.width, height: CGFloat(44))
+        activtiyIndicatorFooter.backgroundColor = UIColor(named: "Gray")
+        return activtiyIndicatorFooter
+    }
+
+    func showActivityIndicatorFooter() {
+        if let activtiyIndicatorFooter = activtiyIndicatorFooter {
+            detailsTableView.tableFooterView = activtiyIndicatorFooter
+        } else {
+            activtiyIndicatorFooter = createActivityIndicatorFooter()
+            detailsTableView.tableFooterView = activtiyIndicatorFooter
+        }
+
+        activtiyIndicatorFooter?.startAnimating()
+        detailsTableView.isHidden = false
+        detailsTableView.layoutIfNeeded()
+    }
+
+    func hideActivityIndicatorFooter() {
+        activtiyIndicatorFooter?.stopAnimating()
+        detailsTableView.tableHeaderView?.frame = CGRect.zero
+        detailsTableView.sectionFooterHeight = 0
+        detailsTableView.tableFooterView = UIView(frame: CGRect.zero)
+        detailsTableView.layoutIfNeeded()
     }
 
     func createDetailsTopPartViewCell(tableView: UITableView, indexPath: IndexPath) -> ShowDetailsTopTableViewCell {

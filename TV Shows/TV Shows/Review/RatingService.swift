@@ -8,9 +8,9 @@
 import Foundation
 import Alamofire
 
-class ReviewManager {
+class ReviewService {
 
-    static let sharedInstance = ReviewManager()
+    static let sharedInstance = ReviewService()
 
     private init() { }
 

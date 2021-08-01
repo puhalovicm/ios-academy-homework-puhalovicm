@@ -41,20 +41,16 @@ final class ShowDetailsTopTableViewCell: UITableViewCell {
 
 extension ShowDetailsTopTableViewCell {
 
-    func configure(with item: Show) {
+    func configure(with item: TVShowItem) {
         showImage.kf.setImage(
-            with: URL(string: item.imageUrl ?? ""),
+            with: item.imageUrl,
             placeholder: UIImage(named: "icImagePlaceholder")
         )
-        descriptionLabel.text = item.description
-        overviewRatingView.setRoundedRating(Double(item.averageRating ?? 0))
+        descriptionLabel.text = item.showDescription
+        overviewRatingView.setRoundedRating(Double(item.averageRating))
 
-        if
-            let noOfReviews = item.noOfReviews,
-            noOfReviews > 1,
-            let averageRating = item.averageRating
-        {
-            showReviewOverviewLabel(noOfReviews: noOfReviews, averageRating: averageRating)
+        if item.noOfReviews > 1 {
+            showReviewOverviewLabel(noOfReviews: item.noOfReviews, averageRating: item.averageRating)
         } else {
             showNoReviewsLabel()
         }

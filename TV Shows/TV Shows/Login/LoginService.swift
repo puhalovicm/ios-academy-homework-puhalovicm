@@ -8,9 +8,9 @@
 import Foundation
 import Alamofire
 
-class LoginManager {
+class LoginService {
 
-    static let sharedInstance = LoginManager()
+    static let sharedInstance = LoginService()
 
     private init() { }
 

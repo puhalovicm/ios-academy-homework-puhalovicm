@@ -44,7 +44,7 @@ extension ReviewViewCell {
         emailLabel.text = item.user.email
 
         profileImage.kf.setImage(
-            with: URL(string: item.user.imageUrl ?? ""),
+            with: item.user.imageUrl,
             placeholder: UIImage(named: "ic-profile-placeholder")
         )
 

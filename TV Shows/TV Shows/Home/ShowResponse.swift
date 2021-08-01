@@ -9,10 +9,10 @@ import Foundation
 
 struct Show: Codable {
     let id: String
-    let averageRating: Double?
+    let averageRating: Double
     let description: String?
-    let imageUrl: String?
-    let noOfReviews: Int?
+    let imageUrl: URL?
+    let noOfReviews: Int
     let title: String
     
      enum CodingKeys: String, CodingKey {
@@ -30,10 +30,10 @@ struct Meta: Codable {
 }
 
 struct Pagination: Codable {
-    let count: Int?
-    let page: Int?
-    let items: Int?
-    let pages: Int?
+    let count: Int
+    let page: Int
+    let items: Int
+    let pages: Int
 }
 
 struct ShowResponse: Codable {

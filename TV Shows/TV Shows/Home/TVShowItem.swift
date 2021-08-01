@@ -11,6 +11,9 @@ import UIKit
 struct TVShowItem {
     let showId: String
     let name: String
-    let imageUrl: String?
-    let show: Show
+    let imageUrl: URL?
+    let showTitle: String
+    let showDescription: String?
+    let noOfReviews: Int
+    let averageRating: Double
 }

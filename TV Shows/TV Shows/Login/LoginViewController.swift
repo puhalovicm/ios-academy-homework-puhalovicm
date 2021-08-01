@@ -26,7 +26,7 @@ final class LoginViewController: UIViewController {
     private var rememberMeSelected: Bool = false
     private var showPassword: Bool = false
     
-    private var loginManager: LoginManager = LoginManager.sharedInstance
+    private var loginService: LoginService = LoginService.sharedInstance
 
     private var user: UserResponse? = nil
     private var authInfo: AuthInfo? = nil
@@ -201,22 +201,24 @@ private extension LoginViewController {
     func attemptLogin() {
         SVProgressHUD.show()
         
-        loginManager.login(
+        loginService.login(
             email: email,
             password: password
         ) { [weak self] result in
+            guard let self = self else { return }
+
             switch result {
             case .success (let user):
-                self?.user = user.0
+                self.user = user.0
 
                 if let headers = user.1 {
-                    self?.authInfo = AuthInfo(headers: headers)
+                    self.authInfo = AuthInfo(headers: headers)
                 }
                 
-                self?.showSuccessMessage()
-                self?.showHomeViewController()
+                self.showSuccessMessage()
+                self.showHomeViewController()
             case .failure:
-                self?.showNetworkErrorMessage()
+                self.showNetworkErrorMessage()
             }
         }
     }
@@ -224,22 +226,24 @@ private extension LoginViewController {
     func attemptRegister() {
         SVProgressHUD.show()
         
-        loginManager.register(
+        loginService.register(
             email: email,
             password: password
         ) { [weak self] result in
+            guard let self = self else { return }
+
             switch result {
             case .success(let user):
-                self?.user = user.0
+                self.user = user.0
 
                 if let headers = user.1 {
-                    self?.authInfo = AuthInfo(headers: headers)
+                    self.authInfo = AuthInfo(headers: headers)
                 }
 
-                self?.showSuccessMessage()
-                self?.showHomeViewController()
+                self.showSuccessMessage()
+                self.showHomeViewController()
             case .failure:
-                self?.showErrorAlert()
+                self.showErrorAlert()
             }
         }
     }
