@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Y6W-OH-hqX">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="TG1-Hb-Ked">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pzp-pS-Zkp">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" contentInsetAdjustmentBehavior="never" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pzp-pS-Zkp">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aRh-6H-4nl">
@@ -41,7 +41,7 @@
                                                 <inset key="imageEdgeInsets" minX="-20" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                 <state key="normal" title="Register"/>
                                                 <connections>
-                                                    <action selector="onButtonClicked:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="kdo-3E-W1h"/>
+                                                    <action selector="onRegisterButtonClicked:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="2fB-SJ-AsE"/>
                                                 </connections>
                                             </button>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo-white" translatesAutoresizingMaskIntoConstraints="NO" id="As8-a8-l3Z">
@@ -64,14 +64,15 @@
                                                         </constraints>
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                        <textInputTraits key="textInputTraits"/>
+                                                        <textInputTraits key="textInputTraits" keyboardType="emailAddress" textContentType="email"/>
                                                         <userDefinedRuntimeAttributes>
                                                             <userDefinedRuntimeAttribute type="color" keyPath="placeholderLabel.textColor">
                                                                 <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             </userDefinedRuntimeAttribute>
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
-                                                            <action selector="onUsernameChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="6P9-aG-a0Z"/>
+                                                            <action selector="onEmailChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="hhm-cB-H3N"/>
+                                                            <action selector="onEmailEnterClicked:" destination="Y6W-OH-hqX" eventType="primaryActionTriggered" id="4f8-lB-x2k"/>
                                                         </connections>
                                                     </textField>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dKw-dv-psp">
@@ -90,6 +91,7 @@
                                                         </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <action selector="onPasswordChanged:" destination="Y6W-OH-hqX" eventType="editingChanged" id="eIw-ZX-GJC"/>
+                                                            <action selector="onPasswordEnterClicked:" destination="Y6W-OH-hqX" eventType="primaryActionTriggered" id="ukq-RL-cbd"/>
                                                         </connections>
                                                     </textField>
                                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="MXq-aw-brf">
@@ -130,7 +132,7 @@
                                                 <inset key="imageEdgeInsets" minX="-20" minY="0.0" maxX="0.0" maxY="0.0"/>
                                                 <state key="normal" title="Login"/>
                                                 <connections>
-                                                    <action selector="onButtonClicked:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="idm-og-UFq"/>
+                                                    <action selector="onLoginButtonClicked:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="eyt-Ez-KtS"/>
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="z7n-sL-ONj">
@@ -186,16 +188,37 @@
                             <constraint firstItem="Pzp-pS-Zkp" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="x7Z-01-4tq"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="1gi-E5-EAC"/>
                     <connections>
+                        <outlet property="emailTextField" destination="2cr-n5-tdh" id="z5K-UQ-Ern"/>
                         <outlet property="loginButton" destination="b1d-uo-Txh" id="tI6-Sb-dlF"/>
                         <outlet property="loginLabel" destination="z7n-sL-ONj" id="xRf-dl-g0B"/>
                         <outlet property="passwordTextField" destination="dKw-dv-psp" id="Eq1-sk-kIj"/>
                         <outlet property="registerButton" destination="Iet-LG-yfV" id="qvL-dy-VW6"/>
                         <outlet property="rememberMeButton" destination="1ZN-6T-fQn" id="98e-qk-tYo"/>
-                        <outlet property="usernameTextField" destination="2cr-n5-tdh" id="z5K-UQ-Ern"/>
+                        <outlet property="scrollView" destination="Pzp-pS-Zkp" id="hkM-IM-WSL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="984.05797101449286" y="45.535714285714285"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="sxY-oJ-9Tm">
+            <objects>
+                <navigationController wantsFullScreenLayout="YES" modalPresentationStyle="overFullScreen" navigationBarHidden="YES" id="TG1-Hb-Ked" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <splitViewMasterSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <navigationBar key="navigationBar" hidden="YES" contentMode="scaleToFill" id="08R-GO-JZv">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Y6W-OH-hqX" kind="relationship" relationship="rootViewController" id="fff-kv-UgB"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="NOD-6c-dGL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="73.913043478260875" y="45.535714285714285"/>
         </scene>
