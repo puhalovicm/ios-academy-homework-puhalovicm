@@ -26,7 +26,6 @@ class WriteReviewViewController: UIViewController {
     weak var delegate: WriteReviewViewControllerDelegate?
 
     var showId: String? = nil
-    var authInfo: AuthInfo? = nil
 
     @IBOutlet private weak var ratingView: RatingView!
     @IBOutlet private weak var commentTextView: UITextView!
@@ -110,7 +109,7 @@ class WriteReviewViewController: UIViewController {
     @IBAction func writeReview(_ sender: Any) {
         guard
             let showId = showId,
-            let authInfo = authInfo,
+            let authInfo = NetworkManager.sharedInstance.authInfo,
             let rating = rating,
             !comment.isEmpty
         else {

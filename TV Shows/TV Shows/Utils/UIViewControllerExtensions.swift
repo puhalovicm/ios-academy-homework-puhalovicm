@@ -12,7 +12,8 @@ extension UIViewController {
 
     func showErrorAlert(
         title: String = "Error occurred",
-        message: String = "Error occurred! Please try again later."
+        message: String = "Error occurred! Please try again later.",
+        okAction: @escaping () -> Void = {}
     ) {
         let alert = UIAlertController(
             title: title,
@@ -25,7 +26,7 @@ extension UIViewController {
                 title: "Ok",
                 style: .default,
                 handler: { _ in
-                    // NO - OP
+                    okAction()
                 }
             )
         )

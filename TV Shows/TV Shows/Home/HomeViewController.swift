@@ -20,7 +20,6 @@ final class HomeViewController: UIViewController {
     }
 
     var userResponse: UserResponse? = nil
-    var authInfo: AuthInfo? = nil
 
     private var activtiyIndicatorFooter: UIActivityIndicatorView? = nil
     @IBOutlet weak var showsTableView: UITableView!
@@ -41,6 +40,14 @@ final class HomeViewController: UIViewController {
         setupProfileButton()
         setupTableView()
         fetchShowsAndUpdate()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(onLogout), name: .didLogout, object: nil)
+    }
+
+    @objc func onLogout() {
+        let storyboard = UIStoryboard.init(name: "Login", bundle: Bundle.main)
+        let loginViewController = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
+        self.navigationController?.setViewControllers([loginViewController], animated: true)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -71,12 +78,15 @@ private extension HomeViewController {
     }
 
     @objc private func didSelectProfileIcon() {
-        // TODO
+        let vc = UIStoryboard.init(name: "Profile", bundle: Bundle.main).instantiateViewController(withIdentifier: "ProfileViewController") as! ProfileViewController
+
+        let navigationController = UINavigationController(rootViewController: vc)
+        present(navigationController, animated: true)
     }
 
     func fetchShowsAndUpdate() {
         guard
-            let headers = authInfo?.headers
+            let headers = NetworkManager.sharedInstance.authInfo?.headers
         else {
             return
         }
@@ -138,11 +148,6 @@ private extension HomeViewController {
     func showDetailsScreen(item: TVShowItem) {
         let vc = UIStoryboard.init(name: "ShowDetails", bundle: Bundle.main).instantiateViewController(withIdentifier: "ShowDetailsViewController") as! ShowDetailsViewController
 
-        guard let authInfo = authInfo else {
-            return
-        }
-
-        vc.authInfo = authInfo
         vc.show = item
 
         navigationController?.pushViewController(vc, animated: true)

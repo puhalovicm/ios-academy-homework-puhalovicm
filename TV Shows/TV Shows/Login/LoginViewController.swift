@@ -29,7 +29,6 @@ final class LoginViewController: UIViewController {
     private var loginService: LoginService = LoginService.sharedInstance
 
     private var user: UserResponse? = nil
-    private var authInfo: AuthInfo? = nil
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -52,8 +51,10 @@ final class LoginViewController: UIViewController {
         loginButton.isEnabled = true
         registerButton.isEnabled = true
         email = "mateo.puhalovic@test.com"
-        password = "password2"
+        password = "password1"
         #endif
+
+        navigationController?.isNavigationBarHidden = true
     }
     
     deinit {
@@ -66,17 +67,6 @@ final class LoginViewController: UIViewController {
 private extension LoginViewController {
 
     func pulsateTextfields() {
-//        UIView.animate(
-//            withDuration: 2.0,
-//            delay: 0.0,
-//            usingSpringWithDamping: 0.3,
-//            initialSpringVelocity: 0.0,
-//            options: [.autoreverse],
-//            animations: {
-//                self.emailTextField.transform = CGAffineTransform(translationX: 100.0, y: 0.0)
-//            }
-//        )
-
         let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
         animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
         animation.duration = 0.6
@@ -234,7 +224,7 @@ private extension LoginViewController {
                 self.user = user.0
 
                 if let headers = user.1 {
-                    self.authInfo = AuthInfo(headers: headers)
+                    NetworkManager.sharedInstance.authInfo = AuthInfo(headers: headers)
 
                     if self.rememberMeSelected {
                         KeychainService.sharedInstance.saveAuthInfo(authInfo: AuthInfo(headers: headers))
@@ -263,7 +253,7 @@ private extension LoginViewController {
                 self.user = user.0
 
                 if let headers = user.1 {
-                    self.authInfo = AuthInfo(headers: headers)
+                    NetworkManager.sharedInstance.authInfo = AuthInfo(headers: headers)
 
                     if self.rememberMeSelected {
                         KeychainService.sharedInstance.saveAuthInfo(authInfo: AuthInfo(headers: headers))
@@ -298,11 +288,6 @@ private extension LoginViewController {
     func showHomeViewController() {
         let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
 
-        guard let authInfo = authInfo else {
-            return
-        }
-
-        vc.authInfo = authInfo
         vc.userResponse = user
 
         navigationController?.pushViewController(vc, animated: true)

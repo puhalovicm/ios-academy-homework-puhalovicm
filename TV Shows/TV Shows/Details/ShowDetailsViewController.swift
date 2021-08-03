@@ -20,7 +20,6 @@ final class ShowDetailsViewController: UIViewController {
     }
 
     var show: TVShowItem? = nil
-    var authInfo: AuthInfo? = nil
 
     @IBOutlet private weak var detailsTableView: UITableView!
     @IBOutlet private weak var writeReviewButton: UIButton!
@@ -54,7 +53,6 @@ final class ShowDetailsViewController: UIViewController {
     @IBAction func launchReviewWriteScreen(_ sender: Any) {
         let vc = UIStoryboard.init(name: "WriteReview", bundle: Bundle.main).instantiateViewController(withIdentifier: "WriteReviewViewController") as! WriteReviewViewController
 
-        vc.authInfo = authInfo
         vc.showId = show?.showId
         vc.delegate = self
 
@@ -95,7 +93,7 @@ private extension ShowDetailsViewController {
 
     func fetchReviewsAndUpdate() {
         guard
-            let headers = authInfo?.headers,
+            let headers = NetworkManager.sharedInstance.authInfo?.headers,
             let showId = show?.showId
         else {
             return

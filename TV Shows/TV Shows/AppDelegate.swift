@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if authInfo != nil {
             let storyboard = UIStoryboard.init(name: "Home", bundle: Bundle.main)
             let homeViewController = storyboard.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
-            homeViewController.authInfo = authInfo
+            NetworkManager.sharedInstance.authInfo = authInfo
             navigationController.viewControllers = [homeViewController]
         } else {
             let storyboard = UIStoryboard.init(name: "Login", bundle: Bundle.main)

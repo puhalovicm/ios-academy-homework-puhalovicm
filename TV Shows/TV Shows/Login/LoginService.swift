@@ -27,6 +27,27 @@ class LoginService {
         
         networkManager.call(type: type, onResult: onResult)
     }
+
+    func fetchUserInfo(headers: [String: String], onResult: @escaping (Result<(UserResponse, [String: String]?), Error>) -> Void) {
+        let type = UserInfoEndPointType(headers: headers)
+        networkManager.call(type: type, onResult: onResult)
+    }
+
+    func storeImage(image: UIImage, headers: [String: String], onResult: @escaping (Result<(UserResponse, [String: String]?), Error>) -> Void) {
+        guard let imageData = image.jpegData(compressionQuality: 0.9) else { return }
+
+        let requestData = MultipartFormData()
+        requestData.append(
+            imageData,
+            withName: "image",
+            fileName: "image.jpg",
+            mimeType: "image/jpg"
+        )
+
+        let type = ImageUploadEndPointType(headers: headers)
+
+        networkManager.callWithMultipartFormData(type: type, multipartFormData: requestData, onResult: onResult)
+    }
 }
 
 class LoginEndPointType : EndPointType {
@@ -68,4 +89,28 @@ class RegisterEndPointType : EndPointType {
     var baseURL = Constants.baseUrl
     var path = "/users"
     var httpMethod = HTTPMethod.post
+}
+
+class UserInfoEndPointType : EndPointType {
+    var headers: [String : String]
+
+    init(headers: [String: String]) {
+        self.headers = headers
+    }
+
+    var baseURL = Constants.baseUrl
+    var path = "/users/me"
+    var httpMethod = HTTPMethod.get
+}
+
+class ImageUploadEndPointType : EndPointType {
+    var headers: [String : String]
+
+    init(headers: [String: String]) {
+        self.headers = headers
+    }
+
+    var baseURL = Constants.baseUrl
+    var path = "/users"
+    var httpMethod = HTTPMethod.put
 }

@@ -13,6 +13,7 @@ class NetworkManager {
     static let sharedInstance = NetworkManager()
 
     let session: Session
+    var authInfo: AuthInfo? = nil
     
     private init() {
         let configuration = URLSessionConfiguration.af.default
@@ -36,6 +37,34 @@ class NetworkManager {
                     break
                 }
             }
+    }
+
+    func callWithMultipartFormData<T>(type: EndPointType, multipartFormData: MultipartFormData, onResult: @escaping (Result<(T, [String: String]?), Error>) -> Void) where T: Codable {
+        do {
+            AF
+                .upload(
+                    multipartFormData: multipartFormData,
+                    to: try type.baseURL.asURL().appendingPathComponent(type.path).absoluteString,
+                    method: .put,
+                    headers: HTTPHeaders(type.headers)
+                )
+                .validate()
+                .responseDecodable(of: T.self) { response in
+                    let headers = response.response?.allHeaderFields as? [String: String]
+
+                    switch response.result {
+                    case .success(let response):
+                        let result = (response, headers)
+                        onResult(.success(result))
+                        break
+                    case .failure(let error):
+                        onResult(.failure(error))
+                        break
+                    }
+                }
+        } catch {
+            return
+        }
     }
 }
 
