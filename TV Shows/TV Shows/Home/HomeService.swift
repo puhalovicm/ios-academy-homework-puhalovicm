@@ -9,7 +9,11 @@ import Foundation
 
 import Alamofire
 
-class HomeManager {
+class HomeService {
+
+    static let sharedInstance = HomeService()
+
+    private init() { }
     
     let networkManager = NetworkManager.sharedInstance
     

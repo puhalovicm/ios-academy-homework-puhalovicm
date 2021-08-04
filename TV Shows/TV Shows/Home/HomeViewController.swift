@@ -20,16 +20,17 @@ final class HomeViewController: UIViewController {
     }
 
     var userResponse: UserResponse? = nil
-    var authInfo: AuthInfo? = nil
 
+    private var activtiyIndicatorFooter: UIActivityIndicatorView? = nil
     @IBOutlet weak var showsTableView: UITableView!
 
     // MARK: - Private
 
-    private let homeManager: HomeManager = HomeManager()
+    private let homeService: HomeService = HomeService.sharedInstance
     private var items: [TVShowItem] = []
     private var currentPage = 1
-
+    private var pages: Int? = nil
+    private var isLoading = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,75 +40,91 @@ final class HomeViewController: UIViewController {
         setupProfileButton()
         setupTableView()
         fetchShowsAndUpdate()
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
 
-        if (offsetY > contentHeight - scrollView.frame.height * 2) && !SVProgressHUD.isVisible() {
-            fetchShowsAndUpdate()
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(onLogout), name: .didLogout, object: nil)
+    }
+
+    @objc func onLogout() {
+        let storyboard = UIStoryboard.init(name: "Login", bundle: Bundle.main)
+        let loginViewController = storyboard.instantiateViewController(withIdentifier: "LoginViewController") as! LoginViewController
+        self.navigationController?.setViewControllers([loginViewController], animated: true)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 }
 
 private extension HomeViewController {
 
     func setupNavigationBar() {
-        self.navigationController?.navigationBar.prefersLargeTitles = true
-        self.navigationController?.isNavigationBarHidden = false
-        self.navigationItem.hidesBackButton = true
-        self.navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
-        self.title = "Shows"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.hidesBackButton = true
+        navigationController?.navigationBar.backgroundColor = UIColor(named: "Gray")
+        title = "Shows"
     }
 
     func setupProfileButton() {
-        if #available(iOS 14.0, *) {
-            let segmentBarItem = UIBarButtonItem(image: UIImage(named: "ic-profile"))
-            segmentBarItem.tintColor = UIColor(named: "Purple")
-            navigationItem.rightBarButtonItem = segmentBarItem
-        } else {
-            // Fallback on earlier versions
-        }
+        let segmentBarItem = UIBarButtonItem(
+            image: UIImage(named: "ic-profile"),
+            style: .plain,
+            target: self,
+            action: #selector(didSelectProfileIcon)
+        )
+        segmentBarItem.tintColor = UIColor(named: "Purple")
+
+        navigationItem.rightBarButtonItem = segmentBarItem
     }
 
-    func setupStatusBar() {
-        if #available(iOS 13, *)
-        {
-            let statusBar = UIView(frame: (UIApplication.shared.keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
-            statusBar.backgroundColor = UIColor(named: "Gray")
-            UIApplication.shared.keyWindow?.addSubview(statusBar)
-        } else {
-           // ADD THE STATUS BAR AND SET A CUSTOM COLOR
-           let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
-           if statusBar.responds(to:#selector(setter: UIView.backgroundColor)) {
-              statusBar.backgroundColor = UIColor(named: "Gray")
-           }
-        }
+    @objc private func didSelectProfileIcon() {
+        let vc = UIStoryboard.init(name: "Profile", bundle: Bundle.main).instantiateViewController(withIdentifier: "ProfileViewController") as! ProfileViewController
+
+        let navigationController = UINavigationController(rootViewController: vc)
+        present(navigationController, animated: true)
     }
 
     func fetchShowsAndUpdate() {
-        SVProgressHUD.show()
-
-        guard let headers = authInfo?.headers else {
+        guard
+            let headers = NetworkManager.sharedInstance.authInfo?.headers
+        else {
             return
         }
 
-        homeManager.fetchShows(
+        if
+            let pages = pages,
+            currentPage > pages {
+            return
+        }
+
+        showActivityIndicatorFooter()
+        isLoading = true
+        
+        homeService.fetchShows(
             page: currentPage,
             headers: headers
         ) { [weak self] result in
-            SVProgressHUD.dismiss()
+            guard let self = self else { return }
+
+            self.hideActivityIndicatorFooter()
+            self.isLoading = false
 
             switch result {
             case .success (let showResponse):
                 let shows = showResponse.0.shows
                 let meta = showResponse.0.meta
 
-                self?.items += self?.mapShowsToItems(shows: shows) ?? []
-                self?.currentPage = (meta.pagination.page ?? self?.currentPage ?? 0) + 1
+                guard
+                    meta.pagination.page == self.currentPage
+                else {
+                    return
+                }
 
-                self?.showsTableView.reloadData()
+                self.items += self.mapShowsToItems(shows: shows)
+                self.currentPage = meta.pagination.page + 1
+                self.pages = meta.pagination.pages
+
+                self.showsTableView.reloadData()
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -117,10 +134,23 @@ private extension HomeViewController {
     func mapShowsToItems(shows: [Show]) -> [TVShowItem] {
         return shows.map { show in
             TVShowItem(
+                showId: show.id,
                 name: show.title,
-                imageUrl: show.imageUrl
+                imageUrl: show.imageUrl,
+                showTitle: show.title,
+                showDescription: show.description,
+                noOfReviews: show.noOfReviews,
+                averageRating: show.averageRating
             )
         }
+    }
+
+    func showDetailsScreen(item: TVShowItem) {
+        let vc = UIStoryboard.init(name: "ShowDetails", bundle: Bundle.main).instantiateViewController(withIdentifier: "ShowDetailsViewController") as! ShowDetailsViewController
+
+        vc.show = item
+
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
@@ -133,16 +163,22 @@ extension HomeViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         showsTableView.deselectRow(at: indexPath, animated: true)
         let item = items[indexPath.row]
+        showDetailsScreen(item: item)
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+
+        if (offsetY > contentHeight - scrollView.frame.height * 2) && !isLoading {
+            fetchShowsAndUpdate()
+        }
     }
 }
 
 extension HomeViewController: UITableViewDataSource {
 
     // MARK: - UITableViewDataSource
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -167,8 +203,36 @@ private extension HomeViewController {
     func setupTableView() {
         showsTableView.estimatedRowHeight = 120
         showsTableView.rowHeight = 120
-        showsTableView.tableFooterView = UIView()
         showsTableView.delegate = self
         showsTableView.dataSource = self
+        showsTableView.tableFooterView = createActivityIndicatorFooter()
+    }
+
+    func createActivityIndicatorFooter() -> UIActivityIndicatorView {
+        let activtiyIndicatorFooter = UIActivityIndicatorView(style: .gray)
+        activtiyIndicatorFooter.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: showsTableView.bounds.width, height: CGFloat(44))
+        activtiyIndicatorFooter.backgroundColor = UIColor(named: "Gray")
+        return activtiyIndicatorFooter
+    }
+
+    func showActivityIndicatorFooter() {
+        if let activtiyIndicatorFooter = activtiyIndicatorFooter {
+            showsTableView.tableFooterView = activtiyIndicatorFooter
+        } else {
+            activtiyIndicatorFooter = createActivityIndicatorFooter()
+            showsTableView.tableFooterView = activtiyIndicatorFooter
+        }
+
+        activtiyIndicatorFooter?.startAnimating()
+        showsTableView.isHidden = false
+        showsTableView.layoutIfNeeded()
+    }
+
+    func hideActivityIndicatorFooter() {
+        activtiyIndicatorFooter?.stopAnimating()
+        showsTableView.tableHeaderView?.frame = CGRect.zero
+        showsTableView.sectionFooterHeight = 0
+        showsTableView.tableFooterView = UIView(frame: CGRect.zero)
+        showsTableView.layoutIfNeeded()
     }
 }

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Profile View Controller-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="ProfileViewController" id="Y6W-OH-hqX" customClass="ProfileViewController" customModule="TV_Shows" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rpT-MC-AMd">
+                                <rect key="frame" x="20" y="69" width="374" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="MOS-Is-TAR">
+                                <rect key="frame" x="20" y="114.5" width="374" height="100"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="48f-UO-bNj">
+                                        <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="egj-dh-yTZ"/>
+                                            <constraint firstAttribute="height" constant="100" id="wgQ-0h-wV2"/>
+                                        </constraints>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZlB-6A-hfa">
+                                        <rect key="frame" x="120" y="0.0" width="254" height="100"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="Change Profile Photo">
+                                            <color key="titleColor" name="Purple"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="changePfoilePhoto:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="ULU-UA-WM8"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="SPv-hF-Xeg"/>
+                                </constraints>
+                            </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1J6-Tn-9am">
+                                <rect key="frame" x="20" y="258.5" width="374" height="48"/>
+                                <color key="backgroundColor" name="Purple"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="48" id="JBJ-sz-0VR"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <state key="normal" title="Logout">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="logoutUser:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="Ert-V9-wGp"/>
+                                </connections>
+                            </button>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="IKO-rw-L03">
+                                <rect key="frame" x="20" y="114.5" width="100" height="100"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="100" id="pef-G1-saN"/>
+                                    <constraint firstAttribute="height" constant="100" id="x7Q-cH-ZOQ"/>
+                                </constraints>
+                                <color key="color" name="Purple"/>
+                            </activityIndicatorView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="1J6-Tn-9am" secondAttribute="trailing" constant="20" id="5n1-vc-gJd"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="rpT-MC-AMd" secondAttribute="trailing" constant="20" id="9ct-y5-dvG"/>
+                            <constraint firstItem="IKO-rw-L03" firstAttribute="top" secondItem="rpT-MC-AMd" secondAttribute="bottom" constant="25" id="B0B-PP-eVX"/>
+                            <constraint firstItem="MOS-Is-TAR" firstAttribute="top" secondItem="rpT-MC-AMd" secondAttribute="bottom" constant="25" id="FQR-jG-yq9"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="MOS-Is-TAR" secondAttribute="trailing" constant="20" id="LEo-p4-r0i"/>
+                            <constraint firstItem="MOS-Is-TAR" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="NFa-r4-y8A"/>
+                            <constraint firstItem="1J6-Tn-9am" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="SzI-gR-ONH"/>
+                            <constraint firstItem="1J6-Tn-9am" firstAttribute="top" secondItem="MOS-Is-TAR" secondAttribute="bottom" constant="44" id="Zzp-jG-R6i"/>
+                            <constraint firstItem="rpT-MC-AMd" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="25" id="feE-pU-K59"/>
+                            <constraint firstItem="IKO-rw-L03" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="jun-MK-lSN"/>
+                            <constraint firstItem="rpT-MC-AMd" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="20" id="pt7-cx-7IX"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="activityIndicatorProfile" destination="IKO-rw-L03" id="cgs-oM-Gnc"/>
+                        <outlet property="emailLabel" destination="rpT-MC-AMd" id="nFz-Xw-B76"/>
+                        <outlet property="logoutButton" destination="1J6-Tn-9am" id="Ibx-v4-q2O"/>
+                        <outlet property="profileImage" destination="48f-UO-bNj" id="hLX-9u-6ke"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="44.927536231884062" y="40.848214285714285"/>
+        </scene>
+    </scenes>
+    <resources>
+        <namedColor name="Purple">
+            <color red="0.32156862745098042" green="0.21176470588235294" blue="0.5490196078431373" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

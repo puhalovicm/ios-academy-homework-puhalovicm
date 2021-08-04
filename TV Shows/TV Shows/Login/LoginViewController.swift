@@ -26,10 +26,9 @@ final class LoginViewController: UIViewController {
     private var rememberMeSelected: Bool = false
     private var showPassword: Bool = false
     
-    private var loginManager: LoginManager = LoginManager()
+    private var loginService: LoginService = LoginService.sharedInstance
 
     private var user: UserResponse? = nil
-    private var authInfo: AuthInfo? = nil
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -54,6 +53,8 @@ final class LoginViewController: UIViewController {
         email = "mateo.puhalovic@test.com"
         password = "password1"
         #endif
+
+        navigationController?.isNavigationBarHidden = true
     }
     
     deinit {
@@ -64,6 +65,15 @@ final class LoginViewController: UIViewController {
 }
 
 private extension LoginViewController {
+
+    func pulsateTextfields() {
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
+        animation.duration = 0.6
+        animation.values = [-20.0, 20.0, -20.0, 20.0, -10.0, 10.0, -5.0, 5.0, 0.0 ]
+        animation.delegate = self
+        passwordTextField.layer.add(animation, forKey: "shake")
+    }
 
     func delayedAction(duration: Double = defaultMessageDuration, action: @escaping () -> ()) {
         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -201,22 +211,30 @@ private extension LoginViewController {
     func attemptLogin() {
         SVProgressHUD.show()
         
-        loginManager.login(
+        loginService.login(
             email: email,
             password: password
         ) { [weak self] result in
+            SVProgressHUD.dismiss()
+
+            guard let self = self else { return }
+
             switch result {
             case .success (let user):
-                self?.user = user.0
+                self.user = user.0
 
                 if let headers = user.1 {
-                    self?.authInfo = AuthInfo(headers: headers)
+                    NetworkManager.sharedInstance.authInfo = AuthInfo(headers: headers)
+
+                    if self.rememberMeSelected {
+                        KeychainService.sharedInstance.saveAuthInfo(authInfo: AuthInfo(headers: headers))
+                    }
                 }
                 
-                self?.showSuccessMessage()
-                self?.showHomeViewController()
+                self.showSuccessMessage()
+                self.showHomeViewController()
             case .failure:
-                self?.showNetworkErrorMessage()
+                self.pulsateTextfields()
             }
         }
     }
@@ -224,22 +242,28 @@ private extension LoginViewController {
     func attemptRegister() {
         SVProgressHUD.show()
         
-        loginManager.register(
+        loginService.register(
             email: email,
             password: password
         ) { [weak self] result in
+            guard let self = self else { return }
+
             switch result {
             case .success(let user):
-                self?.user = user.0
+                self.user = user.0
 
                 if let headers = user.1 {
-                    self?.authInfo = AuthInfo(headers: headers)
+                    NetworkManager.sharedInstance.authInfo = AuthInfo(headers: headers)
+
+                    if self.rememberMeSelected {
+                        KeychainService.sharedInstance.saveAuthInfo(authInfo: AuthInfo(headers: headers))
+                    }
                 }
 
-                self?.showSuccessMessage()
-                self?.showHomeViewController()
+                self.showSuccessMessage()
+                self.showHomeViewController()
             case .failure:
-                self?.showErrorAlert()
+                self.showErrorAlert()
             }
         }
     }
@@ -264,37 +288,9 @@ private extension LoginViewController {
     func showHomeViewController() {
         let vc = UIStoryboard.init(name: "Home", bundle: Bundle.main).instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
 
-        guard let authInfo = authInfo else {
-            return
-        }
-
-        vc.authInfo = authInfo
         vc.userResponse = user
 
         navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    func showErrorAlert(
-        title: String = "Error occurred",
-        message: String = "Error occurred! Please try again later."
-    ) {
-        let alert = UIAlertController(
-            title: title,
-            message: message,
-            preferredStyle: .alert
-        )
-
-        alert.addAction(
-            UIAlertAction(
-                title: "Ok",
-                style: .default,
-                handler: { _ in
-                    // NO - OP
-                }
-            )
-        )
-
-        self.present(alert, animated: true, completion: nil)
     }
 
     func setupPasswordTextField() {
@@ -361,11 +357,7 @@ private extension LoginViewController {
     var isInputValid: Bool {
         !email.isEmpty && !password.isEmpty
     }
-
-    func printMessage() {
-        print("Button clicked!")
-    }
-
+    
     func setupButtons() {
         loginButton.layer.cornerRadius = 25
 
@@ -386,5 +378,12 @@ private extension LoginViewController {
         let imageName = isSelected ? "ic-checkbox-selected" : "ic-checkbox-unselected"
         guard let image = UIImage(named: imageName) else { return }
         rememberMeButton.setImage(image, for: .normal)
+    }
+}
+
+extension LoginViewController: CAAnimationDelegate {
+
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        self.showNetworkErrorMessage()
     }
 }
